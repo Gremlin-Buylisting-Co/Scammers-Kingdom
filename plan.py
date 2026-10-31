@@ -154,7 +154,7 @@ def _csv_text(rows, bom=False, quoting=csv.QUOTE_MINIMAL):
     w = csv.writer(buf, lineterminator="\r\n", quoting=quoting)
     for r in rows:
         w.writerow(r)
-    return ("﻿" if bom else "") + buf.getvalue()
+    return ("\ufeff" if bom else "") + buf.getvalue()
 
 
 def dollars(cents):

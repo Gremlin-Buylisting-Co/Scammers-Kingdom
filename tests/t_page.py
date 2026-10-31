@@ -239,6 +239,45 @@ def page_tests(h):
         {"op": "read", "id": "plan", "prop": "innerHTML"}]})["results"]
     h.ok("10 cards" in r[0] and "40 more cards would fill it" in r[0], "a partly filled last bag says how many more would fill it")
     h.ok("more than you can fill" in r[0], "fewer copies than the bags hold is said")
+    # CK's wanted limit, in the page and in plan.py, with one printing in two conditions
+    capped = [srow(1, "Capped", cash=90, mk=100, qty=10, wants=2), srow(2, "Free", cash=50, mk=100, qty=2),
+              srow(3, "Same", cash=80, mk=100, qty=2, wants=3, cond="EX"), srow(4, "Same", cash=80, mk=100, qty=2, wants=3, cond="NM")]
+    capped[3]["sid"] = capped[2]["sid"]
+    r = node({"mode": "page", "state": base_state(h, capped), "steps": [
+        {"op": "fireList", "list": "#steps button", "index": 2, "event": "click"},
+        {"op": "read", "id": "plan", "prop": "innerHTML"}]})["results"]
+    p = plan.build_plan(capped, S, 2, "cash")
+    h.eq(p["taken"], 2 + 2 + 3, "(plan.py takes only what CK wants: 2 + 2 + 3)")
+    h.eq(total_line(r[0]), (str(p["taken"]), money(p["total"]), money(p["fees"]), money(p["get"])), "the page's plan respects CK's wanted limit the same way plan.py does")
+    # importing from the page: a shoptcg.online file, then My Collection with the Replace / Add choice
+    rows3 = [srow(1, "Imported", cash=50)]
+    st3 = base_state(h, rows3)
+    r = node({"mode": "page", "state": base_state(h, [], has_ck=True), "responses": {
+        "POST /api/import/shoptcg": dict(st3, label="Replaced.", last_import={"copies": 1, "rows": 1, "mode": "replace", "skipped": [], "skipped_count": 0, "other_copies": 0}),
+        "POST /api/import/collection": dict(st3, ok=True, cards=5, mine=3, label="Added.", unplaceable=[], unplaceable_count=0)}, "steps": [
+        {"op": "fireList", "list": "#mode button", "index": 1, "event": "click"},
+        {"op": "fire", "id": "shopIn", "event": "change", "ev": {"files": [{"text": "a,b\n1,2\n"}]}},
+        {"op": "wait", "ms": 60},
+        {"op": "calls"},
+        {"op": "read", "id": "p2", "prop": "hidden"},
+        {"op": "clearcalls"},
+        {"op": "fire", "id": "fileIn", "event": "change", "ev": {"files": [{"text": "x\n"}]}},
+        {"op": "wait", "ms": 60},
+        {"op": "read", "id": "modal", "prop": "hidden"},
+        {"op": "read", "id": "modalText", "prop": "textContent"},
+        {"op": "fire", "id": "mReplace", "event": "click"},
+        {"op": "wait", "ms": 60},
+        {"op": "calls"},
+        {"op": "read", "id": "modal", "prop": "hidden"},
+    ]})["results"]
+    imp = [c for c in r[0] if c["method"] == "POST"][0]
+    h.ok(imp["url"] == "/api/import/shoptcg?mode=add" and imp["body"] == "a,b\n1,2\n", "dropping a file sends it with the chosen Replace / Add mode")
+    h.eq(r[1], False, "after an import the page moves to Step 2")
+    h.eq(r[2], False, "Import My Collection asks Replace / Add / Cancel when the binder has cards")
+    h.ok("Replace your binder (3 cards) with the 5 cards in this file" in r[3], "...naming both counts")
+    urls = [c["url"] for c in r[4] if c["method"] == "POST"]
+    h.eq(urls, ["/api/import/collection?mode=check", "/api/import/collection?mode=replace"], "the file is checked first, then the choice is sent to the program")
+    h.eq(r[5], True, "the question closes")
     # the back-on-the-buylist alert
     brows = [srow(1, "Old", cash=50), srow(2, "Returned", cash=60, back=True), srow(3, "Returned Too", cash=70, back=True)]
     r = node({"mode": "page", "state": base_state(h, brows), "steps": [

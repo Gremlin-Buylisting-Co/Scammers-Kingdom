@@ -449,7 +449,7 @@ input.qtyin{width:64px;background:var(--panel2);border:1px solid var(--border);b
 var GREEN=70, AMBER=40, PAGE=100, MAX_BAGS=50;
 var UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 function norm(s){
-  s=String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^\p{L}\p{N}_\s]/gu,"");
+  s=String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^\p{L}\p{N}_\s]/gu,"");
   return s.split(/\s+/).filter(Boolean).join(" ");
 }
 function band(p){return p===null||p===undefined?"n":p>=GREEN?"g":p>=AMBER?"a":"n";}
@@ -573,7 +573,7 @@ var inflight=0, svT;
 function saving(d){
   inflight+=d;
   var e=$("savedText"); $("saved").classList.toggle("busy",inflight>0);
-  if(inflight>0){e.textContent="Saving…";return;}
+  if(inflight>0){e.textContent="Saving\u2026";return;}
   clearTimeout(svT); svT=setTimeout(function(){if(!inflight)e.textContent="Saved on this PC";},300);
 }
 function api(method,path,body,asText){

@@ -48,7 +48,7 @@ def clamp_qty(n):
 # ---------- reading csv ----------
 
 def _read_csv(text):
-    text = text.lstrip("﻿")
+    text = text.lstrip("\ufeff")
     return [r for r in csv.reader(io.StringIO(text, newline="")) if any(c.strip() for c in r)]
 
 
@@ -149,7 +149,7 @@ def export_csv(rows, info):
         code, number, sid = info(r)
         w.writerow([r["name"], r["set_name"], code, number, FINISH_WORDS[r["finish"]], r["condition"],
                     r["qty"], "Yes" if r["src"] == "hand" else "No", sid])
-    return "﻿" + buf.getvalue()
+    return "\ufeff" + buf.getvalue()
 
 
 def read_my_collection(text):

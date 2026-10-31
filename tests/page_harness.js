@@ -118,6 +118,7 @@ async function runPage() {
       else if (step.op === "set") Object.assign(dom.get(step.id), step.props);
       else if (step.op === "fire") {
         const el = dom.get(step.id);
+        if (step.ev && step.ev.files) step.ev.files = step.ev.files.map((f) => ({ text: () => Promise.resolve(f.text) }));
         el.fire(step.event, Object.assign(step.ev ? { target: Object.assign(Object.create(el), step.ev) } : {}, step.evt || {}));
       }
       else if (step.op === "fireList") dom.lists[step.list][step.index].fire(step.event);
