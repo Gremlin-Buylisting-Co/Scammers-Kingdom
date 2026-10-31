@@ -1,0 +1,1192 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scammer's Kingdom</title>
+<style>
+:root{
+  --bg:#12151c; --panel:#1a1f2d; --panel2:#222839; --text:#e9ecf3; --muted:#9aa3b8; --border:#2c3449;
+  --accent:#6ea2ff; --accent-ink:#0b1630;
+  --green:#3ecf8e; --amber:#f2b632; --grey:#7f889c;
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+  --pop:0 10px 30px rgba(0,0,0,.5);
+}
+:root[data-theme="light"]{
+  --bg:#f3f5fa; --panel:#ffffff; --panel2:#eef1f8; --text:#1a2030; --muted:#5a647a; --border:#d6dbe8;
+  --accent:#2563eb; --accent-ink:#ffffff;
+  --green:#12804a; --amber:#a86a00; --grey:#677086;
+  --shadow:0 1px 2px rgba(20,30,60,.12);
+  --pop:0 10px 30px rgba(20,30,60,.2);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 0 8px;position:relative}
+header h1{margin:0;font-size:28px;letter-spacing:-.01em;margin-right:6px}
+header h1 span{color:var(--accent)}
+.status{color:var(--muted);flex:1 1 220px}
+.status b{color:var(--text);font-weight:600}
+button,select,input{font:inherit;color:inherit}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;min-height:44px}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn.ghost:hover{background:var(--panel2)}
+.btn:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.seg button:focus-visible,.chip:focus-visible,.link:focus-visible,.steps button:focus-visible,.badge:focus-visible,.x:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.icon{width:44px;padding:0;font-size:19px}
+.badge{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;min-height:36px}
+.badge:hover{background:var(--accent);color:var(--accent-ink)}
+.badge[hidden]{display:none}
+.pop{position:absolute;right:0;top:calc(100% + 2px);width:min(360px,calc(100vw - 24px));background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--pop);padding:16px;z-index:20}
+.pop[hidden]{display:none}
+.pop h2{margin:0 0 10px;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+.pop .field{margin-bottom:12px}
+.x{background:none;border:0;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:4px 8px;border-radius:8px}
+.steps{display:flex;gap:8px;margin:8px 0 4px}
+.steps button{flex:1 1 0;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 8px;cursor:pointer;color:var(--muted);font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;text-align:left}
+.steps button i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);color:var(--muted);font-size:14px;flex:none}
+.steps button[aria-current="step"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.steps button[aria-current="step"] i{background:var(--accent-ink);color:var(--accent)}
+.steps button:not([aria-current]):hover{border-color:var(--accent);color:var(--text)}
+section.page{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;margin:12px 0;box-shadow:var(--shadow)}
+section.page[hidden]{display:none}
+.page h2{margin:0 0 4px;font-size:22px}
+.page h2:focus{outline:none}
+.sub{color:var(--muted);margin:0 0 14px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
+.drop{border:2px dashed var(--border);border-radius:14px;padding:30px 16px;text-align:center;background:var(--panel2);cursor:pointer;transition:border-color .15s}
+.drop:hover,.drop.over{border-color:var(--accent)}
+.drop strong{display:block;font-size:20px;margin-bottom:4px}
+.drop span{color:var(--muted);font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:12px}
+.good{color:var(--green);font-weight:700}
+.link{background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0}
+.hint{color:var(--muted);font-size:14px;margin-top:10px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:8px 14px;cursor:pointer;min-height:40px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.unrec{display:none;margin:10px 0 0;padding:10px 14px 10px 32px;background:var(--panel2);border-radius:10px;color:var(--muted);font-size:14px}
+.unrec.show{display:block}
+.alert{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--accent);border-radius:10px;padding:8px 8px 8px 14px;margin-bottom:12px}
+.alert[hidden]{display:none}
+.alert span{flex:1}
+.tools{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:10px}
+.find{position:relative;flex:1 1 260px;min-width:0}
+.find input{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 40px 9px 12px;min-height:44px}
+.find .x{position:absolute;right:4px;top:50%;transform:translateY(-50%)}
+.find .x[hidden]{display:none}
+#showing{margin:2px 0 8px}
+.chip{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;cursor:pointer;min-height:40px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip[hidden]{display:none}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch .tr{width:44px;height:26px;border-radius:13px;background:var(--grey);position:relative;flex:none;transition:background .15s}
+.switch .tr::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked + .tr{background:var(--accent)}
+.switch input:checked + .tr::after{transform:translateX(18px)}
+.switch input:focus-visible + .tr{outline:3px solid var(--accent);outline-offset:2px}
+.summary{background:var(--panel2);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.summary b{color:var(--text)}
+.pager{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin:8px 0;color:var(--muted)}
+.pager b{color:var(--text)}
+.pager .btns{display:flex;gap:8px}
+.pager .btn{padding:6px 14px;min-height:40px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
+td.num,th.num{text-align:right}
+tr.off td{opacity:.55}
+.cname{font-weight:600}
+.cmeta{color:var(--muted);font-size:13px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);margin-left:6px;vertical-align:1px}
+.tag.back{background:var(--accent);color:var(--accent-ink)}
+select.cond{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;min-height:38px}
+.pct{font-size:24px;font-weight:800;line-height:1;text-align:right}
+.pct small{display:block;font-size:12px;font-weight:600;margin-top:2px}
+.meter{height:4px;border-radius:2px;background:var(--border);margin-top:5px;overflow:hidden;min-width:70px}
+.meter i{display:block;height:100%;background:currentColor}
+.g{color:var(--green)} .a{color:var(--amber)} .n{color:var(--grey)}
+.wants{font-size:13px;color:var(--amber);font-weight:600}
+.dash{color:var(--muted)}
+.plancontrols{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.plancontrols label.q{font-weight:600}
+input.num{width:80px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-height:44px;text-align:center;font-size:18px;font-weight:700}
+.why{color:var(--muted);font-size:14px;margin:12px 0}
+.bag{border:1px solid var(--border);border-radius:12px;margin:8px 0;background:var(--panel2)}
+.bag summary{padding:12px 14px;cursor:pointer;font-weight:600;list-style:none;display:flex;gap:8px;align-items:baseline}
+.bag summary::-webkit-details-marker{display:none}
+.bag summary::before{content:"\25B8";color:var(--accent);flex:none}
+.bag[open] summary::before{content:"\25BE"}
+.bag .detail{padding:0 14px 12px;overflow-x:auto}
+.bag .detail table td,.bag .detail table th{padding:6px 8px}
+.fill{color:var(--amber);font-weight:600}
+.total{margin:14px 0 6px;font-size:17px}
+.total b{color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.grid{display:grid;grid-template-columns:1fr;gap:0}
+.field label{display:block;font-weight:600;margin-bottom:4px}
+.field input{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-height:44px}
+.field small{color:var(--muted);display:block;margin-top:4px}
+footer{color:var(--muted);font-size:13px;text-align:center;padding:16px 0 40px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:all .2s;font-weight:600;z-index:50;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toastbtn{background:none;border:0;color:inherit;text-decoration:underline;font:inherit;font-weight:700;cursor:pointer;margin-left:12px;padding:4px}
+.toastbtn[hidden]{display:none}
+.bulk{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:8px 0}
+.bulkact{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bulkact .btn{padding:6px 14px;min-height:40px}
+.bulk select.cond{min-height:40px}
+.cc{display:flex;gap:10px;align-items:flex-start}
+.cc input[type=checkbox],.bulk input[type=checkbox]{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.nameline{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px}
+.act{background:none;border:0;color:var(--accent);cursor:pointer;font-size:13px;text-decoration:underline;padding:4px 6px;opacity:0;transition:opacity .12s}
+tr:hover .act,tr:focus-within .act,.act:focus-visible{opacity:1}
+@media (hover:none){.act{opacity:1}}
+.act:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.rm.act{text-decoration:none}
+tr.sel td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.chpop{position:fixed;z-index:25;width:min(520px,calc(100vw - 16px));background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--pop);padding:8px}
+.chpop[hidden]{display:none}
+.chhead{font-weight:600;padding:4px 10px 6px}
+.pl.static{position:static;box-shadow:none;border:0;max-height:min(320px,45vh)}
+.pl:focus-visible{outline:2px solid var(--accent)}
+.o-cur{color:var(--accent);font-size:12px;font-weight:700}
+.empty{padding:24px 12px;text-align:center;color:var(--muted)}
+.empty .btn{margin-top:10px}
+
+.tag.hand{border-color:var(--grey);color:var(--muted)}
+.saved{color:var(--muted);font-size:13px;white-space:nowrap;cursor:default}
+.saved .tick{color:var(--green);font-weight:700}
+.saved.busy .tick{color:var(--grey)}
+.saved:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.p2head{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;align-items:flex-start}
+.filebox{display:flex;flex-direction:column;gap:4px;align-items:flex-end;text-align:right;max-width:340px}
+.filebox .fbtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.filebox .btn{padding:6px 12px;min-height:40px;font-size:14px}
+.filebox .fnote{font-size:12px}
+.row.third{margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:60;padding:16px}
+.modal[hidden]{display:none}
+.mbox{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:460px;width:100%;box-shadow:var(--pop)}
+.mbox p{margin:0 0 16px;font-size:17px}
+.mbtns{display:flex;flex-wrap:wrap;gap:8px}
+.inl{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+input.sm{width:84px;min-height:44px}
+.addwrap{margin-bottom:12px}
+.addrow{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;margin-top:10px;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:12px}
+.addrow[hidden]{display:none}
+.combo{position:relative;flex:1 1 320px;min-width:0}
+.combo input{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:9px 12px;min-height:44px}
+.combo label,.addrow .inl{font-size:14px}
+.pl{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:min(340px,50vh);overflow-y:auto;margin:0;padding:4px;list-style:none;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--pop);z-index:15}
+.pl[hidden]{display:none}
+.pl li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:8px 10px;border-radius:8px;cursor:pointer;border-left:3px solid transparent}
+.pl li.act{background:var(--panel2);border-left-color:var(--accent)}
+.pl li[aria-disabled="true"]{cursor:default;color:var(--muted)}
+.o-name{font-weight:600}
+.o-meta{color:var(--muted);font-size:14px}
+.o-price{margin-left:auto;font-size:14px;font-weight:600;color:var(--green)}
+.o-price.no{color:var(--grey);font-weight:500}
+.qtybox{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+input.qtyin{width:64px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 6px;min-height:38px;text-align:center}
+.rm{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;width:34px;height:38px;font-size:18px;line-height:1;cursor:pointer;padding:0}
+.rm:hover{color:var(--text);border-color:var(--grey)}
+.rm:focus-visible,input.qtyin:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.preview{position:fixed;z-index:40;pointer-events:none;border-radius:4.5% / 3.2%;overflow:hidden;box-shadow:0 14px 44px rgba(0,0,0,.6);background:#111}
+.preview[hidden]{display:none}
+.sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,0,128,.18),rgba(255,230,0,.2) 25%,rgba(0,255,200,.18) 50%,rgba(80,120,255,.22) 75%,rgba(255,0,200,.18));mix-blend-mode:screen}
+
+@media (max-width:760px){
+  .wrap{padding:12px}
+  header h1{font-size:24px}
+  section.page{padding:16px}
+  .steps button{flex-direction:column;gap:2px;font-size:13px;padding:8px 4px;text-align:center}
+  table.cards thead{display:none}
+  table.cards,table.cards tbody,table.cards tr,table.cards td{display:block;width:100%}
+  table.cards tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--panel2)}
+  table.cards td{border:0;padding:4px 0;text-align:left!important}
+  table.cards td.cardcell{grid-column:1 / -1}
+  table.cards td.pctcell{order:-1}
+  table.cards td[data-l]::before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  table.cards td.cardcell::before{display:none}
+  .pct{text-align:left}
+  .qtybox{justify-content:flex-start}
+  .combo{flex-basis:100%}
+}
+
+.newver{color:var(--accent);font-weight:700;font-size:14px}
+.newver[hidden]{display:none}
+.preview img{display:block;width:100%;height:100%;object-fit:cover}
+.sell{color:var(--accent);font-size:13px;text-decoration:underline;margin-left:6px;white-space:nowrap}
+.fail{color:var(--amber);font-weight:600}
+.lst{margin:6px 0 0;padding:8px 14px 8px 32px;background:var(--panel2);border-radius:10px;color:var(--muted);font-size:14px;max-height:220px;overflow:auto}
+.lst[hidden]{display:none}
+.actions.stack{flex-direction:column;align-items:flex-start;gap:6px}
+.actions .btn,.actions a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.hintline{color:var(--muted);font-size:14px;margin:0}
+.hintline a{color:var(--accent)}
+.noprice{font-size:12px;font-weight:600;color:var(--grey)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Scammer's <span>Kingdom</span></h1>
+  <div class="status" id="status" aria-live="polite"></div>
+  <span class="saved" id="saved" role="status" tabindex="0" title="Your binder is stored on this computer (in the data folder next to the program, never in the browser) and is still here next time you open Scammer's Kingdom. Export My Collection makes a copy you can keep or move."><span class="tick" aria-hidden="true">&#10003;</span> <span id="savedText">Saved on this PC</span></span>
+  <a class="newver" id="newver" href="#" target="_blank" rel="noopener noreferrer" hidden>A new version is available: download it</a>
+  <button class="badge" id="badge" type="button" hidden></button>
+  <button class="btn" id="update" type="button">Update prices</button>
+  <button class="btn ghost icon" id="gear" type="button" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="setpanel" title="Settings">&#9881;</button>
+  <button class="btn ghost icon" id="theme" type="button" aria-label="Switch between dark and light theme" title="Dark / light">&#9788;</button>
+
+  <div class="pop" id="setpanel" role="dialog" aria-label="Settings" hidden>
+    <h2>Settings <button class="x" type="button" id="closeSet" aria-label="Close settings">&times;</button></h2>
+    <div class="grid">
+      <div class="field"><label for="setSize">Cards in a bag</label><input id="setSize" type="number" min="1" max="500" step="1"></div>
+      <div class="field"><label for="setFee">Fee per bag ($)</label><input id="setFee" type="number" min="0" step="0.05"><small>Charged for every bag, full or not.</small></div>
+      <div class="field"><label for="setEX">CK pays for EX, as a share of NM (%)</label><input id="setEX" type="number" min="0" max="100" step="1"><small>Estimate: check CK's grading page.</small></div>
+      <div class="field"><label for="setVG">CK pays for VG, as a share of NM (%)</label><input id="setVG" type="number" min="0" max="100" step="1"><small>Estimate: check CK's grading page.</small></div>
+      <div class="field"><label for="setCredit">Credit bonus (%)</label><input id="setCredit" type="number" min="0" max="1000" step="1"><small>Extra you get when paid in store credit instead of cash.</small></div>
+    </div>
+    <button class="btn ghost" type="button" id="setReset">Reset</button>
+  </div>
+</header>
+
+<div class="alert" id="remind" hidden>
+  <span>It's been 14 days since you exported a copy of your collection. <button class="link" type="button" id="remindExport">Export My Collection</button></span>
+  <button class="x" type="button" id="remindX" aria-label="Dismiss this reminder">&times;</button>
+</div>
+<div class="alert" id="warn" hidden><span id="warnText"></span></div>
+
+<nav class="steps" id="steps" aria-label="Steps">
+  <button type="button" data-s="1"><i>1</i><span>Add cards</span></button>
+  <button type="button" data-s="2"><i>2</i><span>Your binder</span></button>
+  <button type="button" data-s="3"><i>3</i><span>Plan a shipment</span></button>
+</nav>
+
+<!-- STEP 1 -->
+<section class="page" id="p1" hidden>
+  <h2 id="h1s" tabindex="-1">Step 1: Add your cards</h2>
+  <p class="sub">Scan your cards in at shoptcg.online, then bring the export file here.</p>
+  <div class="drop" id="drop" role="button" tabindex="0">
+    <strong>Drop your shoptcg.online export here</strong>
+    <span>or click to pick the file</span>
+  </div>
+  <input type="file" id="shopIn" accept=".csv,text/csv" hidden>
+  <div class="row">
+    <span class="cmeta">When you import:</span>
+    <div class="seg" role="group" aria-label="What to do with the cards already here" id="mode">
+      <button type="button" aria-pressed="true" data-m="replace">Replace what's there</button>
+      <button type="button" aria-pressed="false" data-m="add">Add to what's there</button>
+    </div>
+  </div>
+  <p class="cmeta" style="margin:8px 0 0">Replace swaps out only the cards that came from an earlier import. Cards you added by hand are always kept.</p>
+  <div id="importBox" hidden>
+    <div class="row">
+      <span class="good" id="importMsg"></span>
+      <button class="link" type="button" id="showUnrec" hidden>(show)</button>
+    </div>
+    <ul class="lst" id="unrec" hidden></ul>
+    <div class="row">
+      <span class="cmeta" id="otherMsg"></span>
+      <button class="link" type="button" id="showOther" hidden>(show)</button>
+    </div>
+    <ul class="lst" id="otherList" hidden></ul>
+  </div>
+  <div class="row third">
+    <span>Already exported a collection?</span>
+    <button class="btn ghost" type="button" id="impColl1">Import My Collection</button>
+  </div>
+  <p class="hint">How do I export from shoptcg.online? Open your scanned collection, press Export, and save the file it gives you.</p>
+  <div class="nav"><span></span><button class="btn" type="button" data-go="2">Next: Your binder</button></div>
+</section>
+
+<!-- STEP 2 -->
+<section class="page" id="p2" hidden>
+  <div class="p2head">
+    <div>
+      <h2 id="h2s" tabindex="-1">Step 2: Your binder</h2>
+      <p class="sub">Best first. The big number is how much of the market price CK pays you.</p>
+    </div>
+    <div class="filebox" role="group" aria-label="Your collection file">
+      <span class="cmeta">Your collection file</span>
+      <div class="fbtns">
+        <button class="btn ghost" type="button" id="expBtn">Export My Collection</button>
+        <button class="btn ghost" type="button" id="impBtn">Import My Collection</button>
+      </div>
+      <span class="cmeta fnote">Your binder is kept on this PC automatically. Export a copy to back it up or move it to another PC.</span>
+    </div>
+  </div>
+  <input type="file" id="fileIn" accept=".csv,text/csv" hidden>
+  <div class="addwrap" id="p2add">
+    <div class="row" style="margin-top:0">
+      <button class="btn ghost" type="button" id="addBtn" aria-expanded="false" aria-controls="addrow">+ Add a card</button>
+      <button class="btn ghost" type="button" id="undoBtn" disabled>Undo</button>
+      <span class="cmeta">Changes save right away.</span>
+    </div>
+    <div class="addrow" id="addrow" hidden>
+      <div class="combo">
+        <input id="asearch" type="search" placeholder="Type a card name (2 letters or more)" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="alist" aria-autocomplete="list" aria-label="Search for a card to add">
+        <ul class="pl" id="alist" role="listbox" aria-label="Matching printings" hidden></ul>
+      </div>
+      <label class="inl">Condition <select class="cond" id="acond"><option>NM</option><option>EX</option><option>VG</option></select></label>
+      <label class="inl">Amount <input class="num sm" id="aamt" type="number" min="1" max="999" value="1" inputmode="numeric"></label>
+      <button class="btn" type="button" id="aadd">Add</button>
+      <button class="btn ghost" type="button" id="acancel">Cancel</button>
+    </div>
+    <div class="good" id="aconfirm" role="status" aria-live="polite" style="margin-top:8px"></div>
+  </div>
+  <div id="p2empty" class="empty" hidden></div>
+  <div id="p2body">
+    <div class="alert" id="alert" hidden>
+      <span id="alertText"></span>
+      <button class="x" type="button" id="alertX" aria-label="Dismiss this message">&times;</button>
+    </div>
+    <div class="tools">
+      <label class="switch"><input type="checkbox" id="onlyBuying" checked><span class="tr"></span><span>Only cards CK is buying</span></label>
+      <button class="chip" type="button" id="chipBack" aria-pressed="false"></button>
+      <button class="chip" type="button" id="chipHand" aria-pressed="false"></button>
+      <div class="find">
+        <input type="text" id="search" placeholder="Find in your binder (name, set or number)" aria-label="Find in your binder (name, set or number)" autocomplete="off">
+        <button class="x" type="button" id="clearFind" aria-label="Clear the search" hidden>&times;</button>
+      </div>
+    </div>
+    <div class="cmeta" id="showing" aria-live="polite"></div>
+    <div class="summary" id="summary"></div>
+    <div class="bulk">
+      <label class="inl"><input type="checkbox" id="selAll"> Select all on this page</label>
+      <span class="cmeta" id="selCount"></span>
+      <span class="bulkact" id="bulkAct" hidden>
+        <button class="btn ghost" type="button" id="bulkRemove">Remove selected</button>
+        <select class="cond" id="bulkCond" aria-label="Set condition for selected">
+          <option value="">Set condition for selected</option><option>NM</option><option>EX</option><option>VG</option>
+        </select>
+      </span>
+    </div>
+    <div class="pager" id="pagerTop"></div>
+    <div class="tablewrap">
+      <table class="cards">
+        <thead><tr>
+          <th>Card</th><th>Condition</th><th class="num">Qty</th>
+          <th class="num">CK pays cash (each)</th><th class="num">CK pays credit (each)</th>
+          <th class="num">Market price</th><th class="num">CK % of market</th><th>CK wants</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="pager" id="pagerBot"></div>
+    <p class="hint"><span class="g"><b>Green</b></span> 70% or more &nbsp; <span class="a"><b>Amber</b></span> 40% to 69% &nbsp; <span class="n"><b>Grey</b></span> under 40% or CK is not buying it. Condition is Near Mint (NM) unless you change it.</p>
+  </div>
+  <div class="nav"><button class="btn ghost" type="button" data-go="1">Back</button><button class="btn" type="button" data-go="3">Next: Plan a shipment</button></div>
+</section>
+
+<!-- STEP 3 -->
+<section class="page" id="p3" hidden>
+  <h2 id="h3s" tabindex="-1">Step 3: Plan a shipment</h2>
+  <p class="sub">Pick how many bags you want to send. We pick the best cards to fill them.</p>
+  <div id="p3empty" class="empty" hidden></div>
+  <div id="p3body">
+    <div class="plancontrols">
+      <label class="q" for="bags" id="bagsLabel">How many 50-card bags?</label>
+      <input class="num" type="number" id="bags" min="1" max="50" value="2" inputmode="numeric">
+      <span class="cmeta">Paid in:</span>
+      <div class="seg" role="group" aria-label="Paid in" id="pay">
+        <button type="button" aria-pressed="true" data-p="cash">Cash</button>
+        <button type="button" aria-pressed="false" data-p="credit">Credit</button>
+      </div>
+    </div>
+    <p class="why">Cards CK pays the most for, compared with their market price, go first.</p>
+    <div id="plan"></div>
+    <div class="actions stack" id="planActions">
+      <div class="actions">
+        <a class="btn" id="ckfile" href="#" download>Download CK import file</a>
+        <a class="btn ghost" id="csv" href="#" download>Download CSV</a>
+      </div>
+      <p class="hintline">How to upload it: <a id="ckhow" href="https://www.cardkingdom.com/static/csvImport" target="_blank" rel="noopener noreferrer">Card Kingdom's CSV import page</a></p>
+      <p class="hintline">On Card Kingdom, choose your file, then match the four columns: card name, edition, foil, quantity.</p>
+    </div>
+  </div>
+  <div class="nav"><button class="btn ghost" type="button" data-go="2">Back</button><span></span></div>
+</section>
+
+<footer>Prices: Card Kingdom's buylist and TCGplayer market (via Scryfall). Not affiliated with Card Kingdom. <span id="ver"></span></footer>
+</div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalText" hidden>
+  <div class="mbox">
+    <p id="modalText"></p>
+    <div class="mbtns">
+      <button class="btn" type="button" id="mReplace">Replace</button>
+      <button class="btn ghost" type="button" id="mAdd">Add to my binder</button>
+      <button class="btn ghost" type="button" id="mCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="info" role="dialog" aria-modal="true" aria-labelledby="infoText" hidden>
+  <div class="mbox">
+    <p id="infoText"></p>
+    <ul class="lst" id="infoList"></ul>
+    <div class="mbtns" style="margin-top:12px"><button class="btn" type="button" id="infoOk">OK</button></div>
+  </div>
+</div>
+<div class="preview" id="preview" hidden aria-hidden="true"></div>
+<div class="chpop" id="chpop" hidden>
+  <div class="chhead" id="chhead"></div>
+  <ul class="pl static" id="chlist" role="listbox" tabindex="0" aria-label="Printings of this card"></ul>
+</div>
+<div class="toast" id="toast" role="status"><span id="toastText"></span><button type="button" id="toastUndo" class="toastbtn" hidden>Undo</button></div>
+
+<script>
+(function(){
+"use strict";
+
+/* PURE:BEGIN (no page access in this block: the tests run it on its own) */
+var GREEN=70, AMBER=40, PAGE=100, MAX_BAGS=50;
+var UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+function norm(s){
+  s=String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^\p{L}\p{N}_\s]/gu,"");
+  return s.split(/\s+/).filter(Boolean).join(" ");
+}
+function band(p){return p===null||p===undefined?"n":p>=GREEN?"g":p>=AMBER?"a":"n";}
+function shareFor(c,S){return c==="EX"?S.ex_share:c==="VG"?S.vg_share:100;}
+function cashEach(r,S){return Math.max(1,Math.floor((r.ck.cash*shareFor(r.cond,S)+50)/100));}
+function creditEach(cash,S){return Math.max(1,Math.floor((cash*(100+S.credit_bonus)+50)/100));}
+function condOrder(c){return c==="NM"?3:c==="EX"?2:c==="VG"?1:0;}
+// copies CK would take per row: never more of one printing than CK wants, best condition first
+function allocate(rows){
+  var groups={}, out={};
+  rows.forEach(function(r){if(r.ck){var k=r.sid+"|"+r.finish;(groups[k]=groups[k]||[]).push(r);}});
+  Object.keys(groups).forEach(function(k){
+    var g=groups[k], left=g[0].ck.wants;
+    g.sort(function(a,b){return condOrder(b.cond)-condOrder(a.cond)||a.id-b.id;});
+    g.forEach(function(r){var t=Math.min(r.qty,left);out[r.id]=t;left-=t;});
+  });
+  return out;
+}
+function cmpText(a,b){return a<b?-1:a>b?1:0;}
+function cmpRank(a,b){
+  if(a.buying!==b.buying) return a.buying?-1:1;
+  var ra=a.r, rb=b.r;
+  if(a.buying){
+    var an=a.pct===null, bn=b.pct===null;
+    if(an!==bn) return an?1:-1;
+    if(!an&&a.pct!==b.pct) return b.pct-a.pct;
+    if(a.cash!==b.cash) return b.cash-a.cash;
+  }
+  return cmpText(ra.name.toLowerCase(),rb.name.toLowerCase())||cmpText(ra.set_name.toLowerCase(),rb.set_name.toLowerCase())||
+    cmpText(ra.finish,rb.finish)||cmpText(ra.cond,rb.cond)||ra.id-rb.id;
+}
+// every row with its prices, best first (cards CK is not buying come last)
+function rankRows(rows,S){
+  var copies=allocate(rows);
+  return rows.map(function(r){
+    var buying=!!r.ck, o={r:r,buying:buying,cash:0,credit:0,pct:null,copies:0};
+    if(buying){
+      o.cash=cashEach(r,S); o.credit=creditEach(o.cash,S);
+      o.pct=r.mk?o.cash/r.mk*100:null; o.copies=copies[r.id]||0;
+    }
+    return o;
+  }).sort(cmpRank);
+}
+function matches(r,q){
+  var toks=norm(q).split(" ").filter(Boolean);
+  if(!toks.length) return true;
+  var hay=norm(r.name)+" "+norm(r.set_name)+" "+norm(r.set_code), num=norm(r.number);
+  return toks.every(function(t){return hay.indexOf(t)>-1||num.indexOf(t)===0;});
+}
+function visibleRows(ranked,o){
+  return ranked.filter(function(x){
+    if(o.only&&!x.buying&&!x.r.unresolved) return false;   // cards still being looked up stay visible
+    if(o.backOnly&&!x.r.back) return false;
+    if(o.handOnly&&x.r.src!=="hand") return false;
+    return matches(x.r,o.q||"");
+  });
+}
+function pageSlice(list,page,size){
+  var pages=Math.max(1,Math.ceil(list.length/size)), p=Math.max(0,Math.min(page,pages-1)), from=p*size;
+  return {page:p,pages:pages,from:from,to:Math.min(list.length,from+size),rows:list.slice(from,from+size)};
+}
+function selectedVisible(list,sel){
+  return list.filter(function(x){return sel[x.r.id];}).map(function(x){return x.r.id;});
+}
+function buildPlan(rows,S,bags,pay){
+  var size=S.bag_size, n=Math.max(1,Math.min(MAX_BAGS,parseInt(bags,10)||1)), cap=size*n;
+  var entries=rankRows(rows,S).filter(function(x){return x.buying&&x.copies>0;});
+  var available=entries.reduce(function(a,x){return a+x.copies;},0);
+  var out=[], cur=[], fill=0, remaining=cap;
+  for(var i=0;i<entries.length&&remaining>0;i++){
+    var e=entries[i], c=Math.min(e.copies,remaining);
+    while(c>0){
+      var k=Math.min(size-fill,c);
+      cur.push({row:e.r,qty:k,cash:e.cash,credit:e.credit,pct:e.pct});
+      fill+=k; c-=k; remaining-=k;
+      if(fill===size){out.push(cur);cur=[];fill=0;}
+    }
+  }
+  if(cur.length) out.push(cur);
+  var bagList=[], total=0, fees=0, get=0, taken=0;
+  out.forEach(function(lines,i){
+    var cards=lines.reduce(function(a,l){return a+l.qty;},0);
+    var value=lines.reduce(function(a,l){return a+l.qty*(pay==="credit"?l.credit:l.cash);},0);
+    var fee=S.bag_fee, g=Math.max(0,value-fee);
+    bagList.push({n:i+1,lines:lines,cards:cards,total:value,fee:fee,get:g,missing:Math.max(0,size-cards)});
+    total+=value; fees+=fee; get+=g; taken+=cards;
+  });
+  return {bags:bagList,requested:n,capacity:cap,size:size,pay:pay,taken:taken,available:available,
+          left:available-taken,short:available<cap,total:total,fees:fees,get:get};
+}
+function pictureUrl(sid){
+  sid=String(sid||"").toLowerCase();
+  return UUID.test(sid)?"https://api.scryfall.com/cards/"+sid+"?format=image&version=large":null;
+}
+/* PURE:END */
+
+// ---------- small helpers ----------
+function $(id){return document.getElementById(id);}
+function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function num(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,",");}
+function money(c){return "$"+num((c/100).toFixed(2));}
+function safeLink(u){return typeof u==="string"&&u.indexOf("https://www.cardkingdom.com/")===0?u:null;}
+function foilTag(r){return r.finish==="foil"?'<span class="tag">Foil</span>':r.finish==="etched"?'<span class="tag">Etched</span>':'';}
+function sellLink(r){var u=safeLink(r.link);return u?'<a class="sell" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Sell on CK</a>':'';}
+function when(iso){
+  var d=new Date(iso); if(isNaN(d.getTime())) return "";
+  var now=new Date(), t=d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}).toLowerCase();
+  var day=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  if(day===today) return "today, "+t;
+  if(day===today-86400000) return "yesterday, "+t;
+  return d.toLocaleDateString([], {month:"short",day:"numeric"})+", "+t;
+}
+
+// ---------- state ----------
+var STATE=null, S=null, ROWS=[], RANKED=[], LIST=[], UPD=null;
+var ui={pay:"cash",bags:2,only:true,q:"",backOnly:false,handOnly:false,page:0,step:1,pick:null};
+var sel={}, pageIds=[], pendingText=null;
+
+// ---------- talking to the program ----------
+var inflight=0, svT;
+function saving(d){
+  inflight+=d;
+  var e=$("savedText"); $("saved").classList.toggle("busy",inflight>0);
+  if(inflight>0){e.textContent="Saving\u2026";return;}
+  clearTimeout(svT); svT=setTimeout(function(){if(!inflight)e.textContent="Saved on this PC";},300);
+}
+function api(method,path,body,asText){
+  var o={method:method,headers:{"X-Requested-With":"ScammersKingdom"}};
+  if(body!==undefined){
+    if(asText){o.headers["Content-Type"]="text/plain; charset=utf-8";o.body=body;}
+    else{o.headers["Content-Type"]="application/json";o.body=JSON.stringify(body);}
+  }
+  var post=method==="POST"; if(post) saving(1);
+  return fetch(path,o).then(function(r){
+    return r.json().catch(function(){return {};}).then(function(j){
+      if(post) saving(-1);
+      if(!r.ok){var e=new Error(j.error||("Something went wrong ("+r.status+")."));e.status=r.status;throw e;}
+      return j;
+    });
+  },function(){
+    if(post) saving(-1);
+    throw new Error("Could not reach Scammer's Kingdom. Is its window still open?");
+  });
+}
+function applyState(s){
+  STATE=s; S=s.settings; ROWS=s.rows; RANKED=rankRows(ROWS,S);
+  var ids={}; ROWS.forEach(function(r){ids[r.id]=1;});
+  Object.keys(sel).forEach(function(k){if(!ids[k]) delete sel[k];});
+  renderAll();
+  if(s.lookup&&s.lookup.running) pollLookup();
+}
+// new cards are looked up on Scryfall in the background; redraw when that finishes
+var lkPoll=false;
+function pollLookup(){
+  if(lkPoll) return; lkPoll=true;
+  (function tick(){
+    api("GET","/api/lookup/status").then(function(l){
+      if(l.running){setTimeout(tick,600);return;}
+      lkPoll=false;
+      api("GET","/api/state").then(applyState,function(){});
+    },function(){lkPoll=false;});
+  })();
+}
+function failed(e){
+  toast(e.message||"Something went wrong.",false,7000);
+  if(e.status===404) api("GET","/api/state").then(applyState,function(){});
+}
+function edit(payload){
+  return api("POST","/api/edit",payload).then(function(j){applyState(j);if(j.label) toast(j.label,true);return j;},failed);
+}
+
+// ---------- toast ----------
+var tt;
+function toast(t,undo,ms){
+  $("toastText").textContent=t; $("toastUndo").hidden=!undo;
+  var e=$("toast"); e.classList.add("show"); clearTimeout(tt);
+  tt=setTimeout(function(){e.classList.remove("show");},ms||(undo?10000:2800));
+}
+function undo(){
+  api("POST","/api/undo").then(function(j){applyState(j);sel={};toast(j.label);},failed);
+}
+
+// ---------- header ----------
+function renderHeader(){
+  var p=STATE.prices, st=$("status");
+  if(UPD&&UPD.running) st.textContent=UPD.message||"Updating...";
+  else if(STATE.lookup&&STATE.lookup.running) st.textContent=STATE.lookup.message;
+  else if(!p.has_ck) st.innerHTML="No prices yet. Press <b>Update prices</b> (about 1 minute).";
+  else{
+    var stamps=[p.ck_as_of,p.market_as_of].filter(Boolean).sort();
+    st.innerHTML="Prices from <b>"+esc(when(stamps[0]))+"</b>";
+  }
+  var n=STATE.back.count, b=$("badge"); b.hidden=n===0; b.textContent=n+" back on the buylist";
+  var nv=STATE.new_version, a=$("newver");
+  var href=nv&&typeof nv.url==="string"&&nv.url.indexOf("https://github.com/")===0?nv.url:null;
+  a.hidden=!href; if(href) a.href=href;
+  var up=$("update"); up.disabled=!!(UPD&&UPD.running); up.textContent=up.disabled?"Updating...":"Update prices";
+  $("ver").textContent="Version "+STATE.version;
+  var wl=(STATE.warnings||[]).slice(); if(STATE.lookup&&STATE.lookup.error) wl.push(STATE.lookup.error);
+  var w=$("warn"); w.hidden=!wl.length; $("warnText").textContent=wl.join(" ");
+  $("remind").hidden=!STATE.remind;
+  $("undoBtn").disabled=!STATE.undo.count;
+  $("undoBtn").title=STATE.undo.count?"Undo: "+STATE.undo.label:"Nothing to undo";
+  renderSettings();
+}
+function renderSettings(){
+  if($("setpanel").hidden) return;
+  var ae=document.activeElement;
+  [["setSize",S.bag_size],["setFee",(S.bag_fee/100).toFixed(2)],["setEX",S.ex_share],["setVG",S.vg_share],["setCredit",S.credit_bonus]]
+    .forEach(function(a){if(ae!==$(a[0])) $(a[0]).value=a[1];});
+}
+
+// ---------- steps ----------
+function goStep(n,noFocus){
+  ui.step=n;
+  [1,2,3].forEach(function(i){
+    $("p"+i).hidden=i!==n;
+    var b=document.querySelector('#steps button[data-s="'+i+'"]');
+    if(i===n) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current");
+  });
+  pvHide(); closeChange();
+  renderAll();
+  window.scrollTo(0,0);
+  if(!noFocus) $("h"+n+"s").focus({preventScroll:true});
+}
+function renderAll(){
+  if(!STATE) return;
+  renderHeader();
+  if(ui.step===1) renderStep1();
+  if(ui.step===2) renderCards();
+  if(ui.step===3) renderPlan();
+}
+
+// ---------- step 1 ----------
+function renderStep1(){
+  var li=STATE.last_import, box=$("importBox");
+  box.hidden=!li;
+  var sk=li?li.skipped||[]:[], other=STATE.other_language||[];
+  if(li){
+    $("importMsg").textContent=num(li.copies)+" cards added."+(li.skipped_count?" "+li.skipped_count+" row"+(li.skipped_count===1?"":"s")+" could not be used":"");
+    $("showUnrec").hidden=!sk.length;
+    $("unrec").innerHTML=sk.map(function(s){return "<li>\""+esc(s.name)+"\" ("+esc(s.why)+")</li>";}).join("");
+    if(!sk.length) $("unrec").hidden=true;
+  }
+  var oc=other.reduce(function(a,o){return a+o.qty;},0);
+  $("otherMsg").textContent=oc?num(oc)+" card"+(oc===1?"":"s")+" in other languages left out (CK's prices are for English cards).":"";
+  $("showOther").hidden=!oc;
+  $("otherList").innerHTML=other.map(function(o){return "<li>"+o.qty+" x "+esc(o.name)+" ("+esc(o.set_name)+" #"+esc(o.number)+", "+esc(o.language)+")</li>";}).join("");
+  if(!oc) $("otherList").hidden=true;
+}
+
+// ---------- step 2 ----------
+function emptyMsg(el,body,html){el.hidden=!html;el.innerHTML=html||"";body.hidden=!!html;}
+function showBack(){ui.backOnly=true;ui.handOnly=false;ui.q="";$("search").value="";ui.page=0;goStep(2);}
+function pagerHtml(from,to,total,pages){
+  if(!total) return "<span>0 cards</span>";
+  return '<span><b>'+num(from)+'-'+num(to)+'</b> of '+num(total)+'</span><span class="btns">'+
+    '<button class="btn ghost pgprev" type="button"'+(ui.page<=0?' disabled':'')+'>Prev</button>'+
+    '<button class="btn ghost pgnext" type="button"'+(ui.page>=pages-1?' disabled':'')+'>Next</button></span>';
+}
+function renderBulk(){
+  var n=selectedVisible(LIST,sel).length;
+  $("selCount").textContent=n?num(n)+" selected":"";
+  $("bulkAct").hidden=!n;
+  var all=pageIds.length>0&&pageIds.every(function(id){return sel[id];});
+  var some=pageIds.some(function(id){return sel[id];});
+  $("selAll").checked=all; $("selAll").indeterminate=some&&!all; $("selAll").disabled=!pageIds.length;
+}
+function renderCards(){
+  pvHide(); if(!$("chpop").hidden) closeChange();
+  var hp=STATE.prices.has_ck, hc=ROWS.length>0;
+  if(!hp||!hc){
+    pageIds=[]; LIST=[];
+    emptyMsg($("p2empty"),$("p2body"),
+      !hc&&!hp?'No cards yet.<br><button class="btn" type="button" data-go="1">Add your cards</button>':
+      !hp?'Your cards are in. Press <b>Update prices</b> to see what Card Kingdom pays.':
+      'Your binder is empty. Use <b>+ Add a card</b> above, or <button class="link" type="button" data-go="1">import an export</button>.');
+    return;
+  }
+  emptyMsg($("p2empty"),$("p2body"),"");
+
+  var tot=0, buyCopies=0, cash=0, cred=0, nb=STATE.back.count, nh=0;
+  ROWS.forEach(function(r){tot+=r.qty;if(r.src==="hand")nh+=r.qty;});
+  RANKED.forEach(function(x){if(x.buying){buyCopies+=x.copies;cash+=x.copies*x.cash;cred+=x.copies*x.credit;}});
+  var looking=!!(STATE.lookup&&STATE.lookup.running);
+  if(looking) $("summary").textContent=STATE.lookup.message;
+  else $("summary").innerHTML="CK is buying <b>"+num(buyCopies)+" of your "+num(tot)+" cards</b>: <b>"+money(cash)+" cash</b> or <b>"+money(cred)+" credit</b>.";
+
+  $("alert").hidden=!(nb>0&&!STATE.back.line_dismissed);
+  $("alertText").innerHTML=nb+" of your cards are back on CK's buylist since your last update (<button class=\"link\" type=\"button\" id=\"alertShow\">show them</button>)";
+  var chip=$("chipBack"); chip.hidden=nb===0&&!ui.backOnly;
+  chip.textContent="Back on the buylist ("+nb+")"; chip.setAttribute("aria-pressed",ui.backOnly?"true":"false");
+  var ch=$("chipHand"); ch.hidden=nh===0&&!ui.handOnly;
+  ch.textContent="Added by hand ("+nh+")"; ch.setAttribute("aria-pressed",ui.handOnly?"true":"false");
+
+  LIST=visibleRows(RANKED,ui);
+  var vis={}; LIST.forEach(function(x){vis[x.r.id]=1;});
+  Object.keys(sel).forEach(function(k){if(!vis[k]) delete sel[k];});
+
+  var pg=pageSlice(LIST,ui.page,PAGE); ui.page=pg.page;
+  var ph=pagerHtml(pg.from+1,pg.to,LIST.length,pg.pages);
+  $("pagerTop").innerHTML=ph; $("pagerBot").innerHTML=ph;
+  $("showing").textContent="Showing "+num(LIST.length)+" of "+num(ROWS.length)+" cards";
+  $("clearFind").hidden=!ui.q;
+  pageIds=pg.rows.map(function(x){return x.r.id;});
+  renderBulk();
+
+  if(!LIST.length){
+    var qq=ui.q.trim();
+    $("tbody").innerHTML='<tr><td colspan="8" class="empty">'+(qq?
+      'No card in your binder matches \''+esc(qq)+'\'.<br><button class="btn" type="button" id="addFromFind">Add it with + Add a card</button>':
+      'No cards match.')+'</td></tr>';
+    return;
+  }
+  $("tbody").innerHTML=pg.rows.map(function(x){
+    var r=x.r, b=x.buying, k=band(x.pct), id=r.id, nm=esc(r.name);
+    var pctHtml, lk=r.unresolved?(looking?"looking up…":"not looked up"):"";
+    if(r.unresolved&&(!b||x.pct===null)) pctHtml='<div class="pct n"><small>'+lk+'</small></div>';
+    else if(!b) pctHtml=r.unknown?'<div class="pct n"><small>Card not found</small></div>':'<div class="pct n"><small>not buying</small></div>';
+    else if(x.pct===null) pctHtml='<div class="pct n"><small>no market price</small></div>';
+    else pctHtml='<div class="pct '+k+'">'+Math.round(x.pct)+'%<div class="meter"><i style="width:'+Math.min(100,x.pct)+'%"></i></div></div>';
+    var wants=!b?'<span class="dash">&mdash;</span>':'<span class="wants">CK wants '+r.ck.wants+'</span>';
+    var mk=r.mk===null||r.mk===undefined?'<span class="noprice">'+(r.unresolved?lk:'no market price')+'</span>':money(r.mk)+(r.mk_src==="scan"?' <span class="cmeta" title="Price from your scan. Press Update prices for the current one.">(scan)</span>':'');
+    return '<tr class="'+(b?'':'off ')+(sel[id]?'sel':'')+'" data-id="'+id+'">'+
+      '<td class="cardcell"><div class="cc"><input type="checkbox" class="rowchk" data-id="'+id+'"'+(sel[id]?' checked':'')+' aria-label="Select '+nm+'"><div>'+
+        '<div class="nameline"><span class="cname" data-id="'+id+'">'+nm+'</span>'+foilTag(r)+(r.back?'<span class="tag back">Back</span>':'')+(r.src==="hand"?'<span class="tag hand">Added by hand</span>':'')+
+          '<button type="button" class="act chg" data-id="'+id+'" aria-label="Change the printing of '+nm+'">Change</button>'+sellLink(r)+'</div>'+
+        '<div class="cmeta">'+esc(r.set_name)+(r.number?' &middot; #'+esc(r.number):'')+'</div></div></div></td>'+
+      '<td data-l="Condition"><select class="cond rowcond" data-id="'+id+'" aria-label="Condition for '+nm+'">'+
+        ["NM","EX","VG"].map(function(c){return '<option'+(c===r.cond?' selected':'')+'>'+c+'</option>';}).join('')+'</select></td>'+
+      '<td class="num" data-l="Qty"><div class="qtybox"><input type="number" class="qtyin" min="0" max="9999" value="'+r.qty+'" data-id="'+id+'" aria-label="Quantity of '+nm+' (0 removes it)">'+
+        '<button type="button" class="act rm" data-id="'+id+'" aria-label="Remove '+nm+'" title="Remove">&times;</button></div></td>'+
+      '<td class="num" data-l="CK pays cash">'+(b?money(x.cash):'<span class="dash">&mdash;</span>')+'</td>'+
+      '<td class="num" data-l="CK pays credit">'+(b?money(x.credit):'<span class="dash">&mdash;</span>')+'</td>'+
+      '<td class="num" data-l="Market price">'+mk+'</td>'+
+      '<td class="num pctcell" data-l="CK % of market">'+pctHtml+'</td>'+
+      '<td data-l="CK wants">'+wants+'</td></tr>';
+  }).join('');
+}
+
+// ---------- step 3 ----------
+function renderPlan(){
+  if(!ROWS.length){emptyMsg($("p3empty"),$("p3body"),'No cards yet.<br><button class="btn" type="button" data-go="1">Add your cards</button>');return;}
+  if(!STATE.prices.has_ck){emptyMsg($("p3empty"),$("p3body"),'Press <b>Update prices</b> at the top, then plan your bags here.');return;}
+  emptyMsg($("p3empty"),$("p3body"),"");
+  var p=buildPlan(ROWS,S,ui.bags,ui.pay);
+  $("bagsLabel").textContent="How many "+S.bag_size+"-card bags?";
+  var label=ui.pay==="cash"?"cash":"credit", html="";
+  p.bags.forEach(function(b){
+    html+='<details class="bag"><summary><span>Bag '+b.n+': '+b.cards+' card'+(b.cards===1?'':'s')+', '+money(b.total)+' '+label+', bag fee '+money(b.fee)+', you get '+money(b.get)+
+      (b.missing?' <span class="fill">&middot; '+b.missing+' more card'+(b.missing===1?'':'s')+' would fill it</span>':'')+'</span></summary>'+
+      '<div class="detail"><table><thead><tr><th class="num">Qty</th><th>Card</th><th>Cond.</th><th class="num">CK pays each</th><th class="num">CK % of market</th></tr></thead><tbody>'+
+      b.lines.map(function(l){
+        var r=l.row;
+        return '<tr><td class="num">'+l.qty+'</td><td>'+esc(r.name)+foilTag(r)+' <span class="cmeta">'+esc(r.set_name)+'</span>'+sellLink(r)+'</td><td>'+r.cond+'</td><td class="num">'+money(ui.pay==="credit"?l.credit:l.cash)+
+          '</td><td class="num '+band(l.pct)+'">'+(l.pct===null?'<span class="noprice">no market price</span>':'<b>'+Math.round(l.pct)+'%</b>')+'</td></tr>';
+      }).join('')+'</tbody></table></div></details>';
+  });
+  $("planActions").hidden=!p.bags.length;
+  if(!p.bags.length) html='<div class="empty">CK is not buying any of your cards right now.</div>';
+  else{
+    html+='<div class="total">Total: <b>'+num(p.taken)+' cards</b>, '+money(p.total)+' '+label+', bag fees '+money(p.fees)+', you get <b>'+money(p.get)+'</b>.</div>';
+    if(p.short) html+='<div class="cmeta">CK is buying only '+num(p.available)+' copies of your cards, so '+p.requested+' bags is more than you can fill. Only the bags you need are shown.</div>';
+    else if(p.left>0) html+='<div class="cmeta">'+num(p.left)+' more cards CK is buying stay with you this time (they ranked lower).</div>';
+    $("ckfile").href="/download/ck-import.csv?bags="+p.requested;
+    $("csv").href="/download/plan.csv?bags="+p.requested+"&pay="+ui.pay;
+  }
+  $("plan").innerHTML=html;
+}
+
+// ---------- card picture preview (the browser loads it from Scryfall; this program never does) ----------
+var pvTimer=null, pvAt=0, pvTok=0;
+function pvHide(){clearTimeout(pvTimer);pvTok++;$("preview").hidden=true;}
+function pvShow(c,rect,center){
+  var url=pictureUrl(c.sid); if(!url){pvHide();return;}
+  var vw=window.innerWidth, vh=window.innerHeight, m=8, gap=12;
+  var W=Math.min(420,(vh-2*m)*488/680,vw-2*m), left;
+  if(rect.right+gap+W<=vw-m) left=rect.right+gap;
+  else if(rect.left-gap-W>=m) left=rect.left-gap-W;
+  else{
+    var rr=vw-m-(rect.right+gap), rl=rect.left-gap-m, room=Math.max(rr,rl);
+    if(room>=160){W=Math.min(W,room);left=rr>=rl?rect.right+gap:rect.left-gap-W;}
+    else{W=Math.min(W,vw*0.6);left=vw-m-W;}
+  }
+  var H=W*680/488;
+  var top=center?rect.top+rect.height/2-H/2:rect.top;
+  top=Math.max(m,Math.min(top,vh-H-m));
+  var p=$("preview"), tok=++pvTok;
+  p.hidden=true;
+  p.style.left=left+"px"; p.style.top=top+"px"; p.style.width=W+"px"; p.style.height=H+"px";
+  p.innerHTML='<img alt="" referrerpolicy="no-referrer" src="'+url+'">'+(c.foil?'<div class="sheen"></div>':'');
+  var img=p.firstChild;
+  img.onload=function(){if(tok===pvTok){p.hidden=false;pvAt=Date.now();}};
+  img.onerror=function(){if(tok===pvTok) p.hidden=true;};
+}
+function pvLater(c,rectFn,ms,center){
+  clearTimeout(pvTimer);
+  pvTimer=setTimeout(function(){pvShow(c,rectFn(),center);},ms);
+}
+
+// ---------- the printing search dropdown (used by "+ Add a card" and by "Change") ----------
+function optHtml(ulId,p,k,cur){
+  var isCur=cur&&cur.sid===p.sid&&cur.finish===p.finish;
+  var meta=esc(p.edition)+(p.number?' &middot; #'+esc(p.number):p.variation?' &middot; '+esc(p.variation):'');
+  return '<li role="option" id="'+ulId+'-'+k+'" data-k="'+k+'" aria-selected="false">'+
+    '<span class="o-name">'+esc(p.name)+'</span><span class="o-meta">'+meta+'</span>'+
+    (p.finish==="foil"?'<span class="tag" style="margin-left:0">Foil</span>':p.finish==="etched"?'<span class="tag" style="margin-left:0">Etched</span>':'')+
+    (isCur?'<span class="o-cur">current</span>':'')+
+    '<span class="o-price'+(p.buying?'':' no')+'">'+(p.buying?'CK pays '+money(p.cash):'not buying')+'</span></li>';
+}
+function makeCombo(ul,anchor,onPick,owner){
+  var c={items:[],act:-1,cur:null,lastK:-1};
+  function mark(scroll){
+    Array.prototype.forEach.call(ul.children,function(li,k){li.classList.toggle("act",k===c.act);li.setAttribute("aria-selected",k===c.act?"true":"false");});
+    if(owner&&c.act>=0) owner.setAttribute("aria-activedescendant",ul.id+"-"+c.act);
+    var li=ul.children[c.act]; if(scroll&&li&&li.scrollIntoView) li.scrollIntoView({block:"nearest"});
+  }
+  c.set=function(items,cur,startAt,emptyText){
+    c.items=items; c.cur=cur||null; c.act=items.length?(startAt||0):-1; c.lastK=-1;
+    ul.innerHTML=items.length?items.map(function(p,k){return optHtml(ul.id,p,k,c.cur);}).join(""):'<li aria-disabled="true">'+esc(emptyText||"No card found")+'</li>';
+  };
+  c.isOpen=function(){return !ul.hidden;};
+  c.show=function(){ul.hidden=false;if(owner)owner.setAttribute("aria-expanded","true");mark(true);};
+  c.hide=function(){ul.hidden=true;c.lastK=-1;if(owner){owner.setAttribute("aria-expanded","false");owner.removeAttribute("aria-activedescendant");}pvHide();};
+  c.move=function(d){
+    if(!c.items.length) return;
+    c.act=(c.act+d+c.items.length)%c.items.length; mark(true);
+    var p=c.items[c.act]; pvShow({sid:p.sid,foil:p.finish!=="nonfoil"},anchor().getBoundingClientRect(),false);
+  };
+  c.pickAct=function(){if(c.act>=0) c.pick(c.act);};
+  c.pick=function(k){var p=c.items[k]; if(p){c.hide();onPick(p);}};
+  ul.addEventListener("mousedown",function(e){e.preventDefault();});
+  ul.addEventListener("click",function(e){var li=e.target.closest("li[data-k]");if(li)c.pick(+li.getAttribute("data-k"));});
+  ul.addEventListener("mouseover",function(e){
+    var li=e.target.closest("li[data-k]"); if(!li) return;
+    var k=+li.getAttribute("data-k"); if(k===c.lastK) return;
+    c.lastK=k; c.act=k; mark(false);
+    var p=c.items[k];
+    pvLater({sid:p.sid,foil:p.finish!=="nonfoil"},function(){return anchor().getBoundingClientRect();},150,false);
+  });
+  ul.addEventListener("mouseleave",function(){c.lastK=-1;pvHide();});
+  return c;
+}
+function label(p){return p.name+" ("+p.edition+(p.number?" #"+p.number:p.variation?" "+p.variation:"")+(p.finish==="foil"?", foil":p.finish==="etched"?", etched":"")+")";}
+var addCombo=makeCombo($("alist"),function(){return $("alist");},function(p){
+  ui.pick=p; $("asearch").value=label(p); $("aamt").focus(); $("aamt").select();
+},$("asearch"));
+var chId=null;
+var chCombo=makeCombo($("chlist"),function(){return $("chpop");},function(p){
+  var id=chId; closeChange(); if(id!==null) edit({op:"printing",id:id,sid:p.sid,finish:p.finish});
+},$("chlist"));
+
+var searchSeq=0, searchTimer=null;
+function runSearch(){
+  var v=$("asearch").value, seq=++searchSeq;
+  api("GET","/api/search?q="+encodeURIComponent(v)).then(function(j){
+    if(seq!==searchSeq||ui.pick) return;
+    addCombo.set(j.items||[],null,0,j.ok===false?j.message:"No card found"); addCombo.show();
+  },function(){});
+}
+function onAsearch(){
+  ui.pick=null; searchSeq++; clearTimeout(searchTimer);
+  var v=$("asearch").value;
+  if(v.trim().length<2){addCombo.hide();return;}
+  searchTimer=setTimeout(runSearch,120);
+}
+function openAdd(prefill){
+  $("addrow").hidden=false; $("addBtn").setAttribute("aria-expanded","true");
+  if(typeof prefill==="string"){$("asearch").value=prefill;onAsearch();}
+  $("asearch").focus();
+}
+function closeAdd(){
+  $("addrow").hidden=true; $("addBtn").setAttribute("aria-expanded","false");
+  searchSeq++; addCombo.hide(); ui.pick=null; $("asearch").value=""; $("aamt").value=1;
+}
+function doAdd(){
+  var p=ui.pick, conf=$("aconfirm");
+  if(!p){conf.className="fail";conf.textContent=STATE.prices.has_ck?"Pick a card from the list first.":"Press Update prices first: the card list comes with Card Kingdom's prices.";$("asearch").focus();return;}
+  var amt=Math.max(1,Math.min(999,parseInt($("aamt").value,10)||1)), cond=$("acond").value;
+  api("POST","/api/add",{sid:p.sid,finish:p.finish,condition:cond,amount:amt}).then(function(j){
+    applyState(j);
+    conf.className="good"; conf.textContent=j.label+(j.need_market?" Press Update prices to get its market price.":"");
+    toast(j.label,true);
+  },function(e){conf.className="fail";conf.textContent=e.message;});
+  ui.pick=null; $("asearch").value=""; $("aamt").value=1; addCombo.hide(); $("asearch").focus();
+}
+
+// ---------- change printing popup ----------
+function openChange(id,btn){
+  var r=null; ROWS.forEach(function(x){if(x.id===id) r=x;}); if(!r) return;
+  chId=id;
+  api("GET","/api/search?name="+encodeURIComponent(r.name)).then(function(j){
+    if(chId!==id) return;
+    var items=j.items||[], cur=-1;
+    items.forEach(function(p,k){if(p.sid===r.sid&&p.finish===r.finish) cur=k;});
+    chCombo.set(items,{sid:r.sid,finish:r.finish},cur<0?0:cur,j.ok===false?j.message:"No other printing found");
+    $("chhead").textContent="Change the printing of "+r.name;
+    var rect=btn.getBoundingClientRect(), pop=$("chpop"), w=Math.min(520,window.innerWidth-16);
+    pop.style.left=Math.max(8,Math.min(rect.left,window.innerWidth-w-8))+"px";
+    pop.style.top=Math.max(8,Math.min(rect.bottom+4,window.innerHeight-360))+"px";
+    pop.hidden=false; chCombo.show(); $("chlist").focus({preventScroll:true});
+  },failed);
+}
+function closeChange(){$("chpop").hidden=true;chCombo.hide();chId=null;}
+
+// ---------- importing ----------
+function handleShopFile(file){
+  if(!file) return;
+  var mode=document.querySelector("#mode button[aria-pressed=true]").getAttribute("data-m");
+  file.text().then(function(text){
+    return api("POST","/api/import/shoptcg?mode="+mode,text,true);
+  }).then(function(j){
+    sel={}; applyState(j); toast(j.label,true); goStep(2,true);
+  }).catch(failed);
+}
+function openModal(text){$("modalText").textContent=text;$("modal").hidden=false;$("mReplace").focus();}
+function closeModal(){$("modal").hidden=true;pendingText=null;}
+function showInfo(text,list){
+  $("infoText").textContent=text;
+  $("infoList").innerHTML=list.map(function(s){return "<li>\""+esc(s.name)+"\" (line "+s.line+": "+esc(s.why)+")</li>";}).join("");
+  $("infoList").hidden=!list.length; $("info").hidden=false; $("infoOk").focus();
+}
+function readCollectionFile(file){
+  if(!file) return;
+  file.text().then(function(text){
+    return api("POST","/api/import/collection?mode=check",text,true).then(function(c){
+      pendingText=text;
+      if(!c.mine){applyCollection("add",c);return;}
+      openModal("Replace your binder ("+num(c.mine)+" cards) with the "+num(c.cards)+" cards in this file? Or add them to your binder. You can undo this.");
+      pendingCheck=c;
+    });
+  }).catch(failed);
+}
+var pendingCheck=null;
+function applyCollection(mode,check){
+  var text=pendingText; $("modal").hidden=true; pendingText=null; check=check||pendingCheck;
+  if(text===null) return;
+  api("POST","/api/import/collection?mode="+mode,text,true).then(function(j){
+    sel={}; applyState(j); toast(j.label,true); if(ui.step!==2) goStep(2,true);
+    if(j.unplaceable_count) showInfo(j.unplaceable_count+" row"+(j.unplaceable_count===1?"":"s")+" in the file could not be placed and were left out:",j.unplaceable);
+  }).catch(failed);
+}
+function exportCollection(){
+  if(!ROWS.length){toast("Your binder is empty, so there is nothing to export.");return;}
+  var a=document.createElement("a"); a.href="/download/collection.csv"; a.download="";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  var n=ROWS.reduce(function(t,r){return t+r.qty;},0);
+  STATE.remind=false; $("remind").hidden=true;
+  toast("Exported "+num(n)+" cards. Look in your Downloads folder.",false,5000);
+}
+
+// ---------- updating prices ----------
+function startUpdate(){
+  UPD={running:true,message:"Starting..."}; renderHeader();
+  api("POST","/api/update").then(poll,function(e){
+    if(e.status===409) poll(); else{UPD=null;renderHeader();failed(e);}
+  });
+}
+function poll(){
+  api("GET","/api/update/status").then(function(u){
+    if(u.running){UPD=u;renderHeader();setTimeout(poll,600);return;}
+    UPD=null;
+    api("GET","/api/state").then(function(s){
+      applyState(s);
+      var r=u.result;
+      if(r) toast(r.ok?"Prices updated.":r.lines.join(" "),false,r.ok?2800:12000);
+    });
+  },function(e){UPD=null;renderHeader();failed(e);});
+}
+
+// ---------- wiring ----------
+document.addEventListener("click",function(e){
+  var t=e.target, g=t.closest&&t.closest("[data-go]");
+  if(g){goStep(+g.getAttribute("data-go"));return;}
+  if(t.id==="alertShow"){showBack();return;}
+  if(t.id==="addFromFind"){goStep(2,true);openAdd(ui.q.trim());return;}
+  var pv=t.closest&&t.closest(".pgprev"), nx=t.closest&&t.closest(".pgnext");
+  if(pv&&!pv.disabled){ui.page=Math.max(0,ui.page-1);renderCards();$("p2").scrollIntoView({block:"start"});return;}
+  if(nx&&!nx.disabled){ui.page++;renderCards();$("p2").scrollIntoView({block:"start"});return;}
+  var chg=t.closest&&t.closest(".chg");
+  if(chg){openChange(+chg.getAttribute("data-id"),chg);return;}
+  var rm=t.closest&&t.closest(".rm");
+  if(rm){edit({op:"remove",id:+rm.getAttribute("data-id")});return;}
+  if(!$("chpop").hidden&&!t.closest("#chpop")) closeChange();
+  if(!t.closest(".combo")&&addCombo.isOpen()) addCombo.hide();
+  if(!$("setpanel").hidden&&!t.closest("#setpanel")&&!t.closest("#gear")) closeSettings();
+});
+document.querySelectorAll("#steps button").forEach(function(b){b.addEventListener("click",function(){goStep(+b.getAttribute("data-s"));});});
+$("badge").addEventListener("click",showBack);
+$("alertX").addEventListener("click",function(){
+  api("POST","/api/ui",{action:"dismiss_back_line"}).then(applyState,failed);
+});
+$("chipBack").addEventListener("click",function(){ui.backOnly=!ui.backOnly;ui.page=0;renderCards();});
+$("chipHand").addEventListener("click",function(){ui.handOnly=!ui.handOnly;ui.page=0;renderCards();});
+$("tbody").addEventListener("change",function(e){
+  var t=e.target, id=+t.getAttribute("data-id");
+  if(t.classList.contains("rowcond")) edit({op:"condition",id:id,condition:t.value});
+  else if(t.classList.contains("qtyin")){
+    var v=parseInt(t.value,10);
+    if(isNaN(v)||v<0||v>9999) renderCards(); else edit({op:"qty",id:id,qty:v});
+  }
+  else if(t.classList.contains("rowchk")){
+    if(t.checked) sel[id]=true; else delete sel[id];
+    var tr=t.closest("tr"); if(tr) tr.classList.toggle("sel",t.checked);
+    renderBulk();
+  }
+});
+var hoverId=null;
+$("tbody").addEventListener("mouseover",function(e){
+  var n=e.target.closest&&e.target.closest(".cname");
+  var id=n?+n.getAttribute("data-id"):null;
+  if(id===hoverId) return;
+  hoverId=id; pvHide();
+  if(n){var r=null; ROWS.forEach(function(x){if(x.id===id) r=x;}); if(r) pvLater({sid:r.sid,foil:r.finish!=="nonfoil"},function(){return n.closest("td").getBoundingClientRect();},150,true);}
+});
+$("tbody").addEventListener("mouseleave",function(){hoverId=null;pvHide();});
+window.addEventListener("scroll",function(){if(Date.now()-pvAt>500) pvHide();},{passive:true});
+window.addEventListener("resize",function(){pvHide();});
+$("selAll").addEventListener("change",function(e){
+  pageIds.forEach(function(id){if(e.target.checked) sel[id]=true; else delete sel[id];});
+  renderCards();
+});
+$("bulkRemove").addEventListener("click",function(){
+  var ids=selectedVisible(LIST,sel); if(ids.length){sel={};edit({op:"remove",ids:ids});}
+});
+$("bulkCond").addEventListener("change",function(e){
+  var v=e.target.value; e.target.value=""; var ids=selectedVisible(LIST,sel);
+  if(ids.length&&v){sel={};edit({op:"condition",ids:ids,condition:v});}
+});
+$("onlyBuying").addEventListener("change",function(e){ui.only=e.target.checked;ui.page=0;renderCards();});
+$("search").addEventListener("input",function(e){ui.q=e.target.value;ui.page=0;renderCards();});
+$("clearFind").addEventListener("click",function(){ui.q="";$("search").value="";ui.page=0;renderCards();$("search").focus();});
+$("search").addEventListener("keydown",function(e){if(e.key==="Escape"&&ui.q){e.stopPropagation();ui.q="";this.value="";ui.page=0;renderCards();}});
+$("bags").addEventListener("input",function(e){
+  var v=parseInt(e.target.value,10);
+  if(v>=1){ui.bags=Math.min(MAX_BAGS,v);renderPlan();}
+});
+$("bags").addEventListener("blur",function(e){e.target.value=Math.max(1,Math.min(MAX_BAGS,parseInt(e.target.value,10)||1));ui.bags=+e.target.value;renderPlan();});
+document.querySelectorAll("#pay button").forEach(function(b){b.addEventListener("click",function(){
+  ui.pay=b.getAttribute("data-p");
+  document.querySelectorAll("#pay button").forEach(function(o){o.setAttribute("aria-pressed",o===b?"true":"false");});
+  renderPlan();
+});});
+document.querySelectorAll("#mode button").forEach(function(b){b.addEventListener("click",function(){
+  document.querySelectorAll("#mode button").forEach(function(o){o.setAttribute("aria-pressed",o===b?"true":"false");});
+});});
+$("showUnrec").addEventListener("click",function(){var on=$("unrec").hidden;$("unrec").hidden=!on;this.textContent=on?"(hide)":"(show)";});
+$("showOther").addEventListener("click",function(){var on=$("otherList").hidden;$("otherList").hidden=!on;this.textContent=on?"(hide)":"(show)";});
+
+$("addBtn").addEventListener("click",function(){if($("addrow").hidden) openAdd(); else closeAdd();});
+$("acancel").addEventListener("click",function(){closeAdd();$("addBtn").focus();});
+$("aadd").addEventListener("click",doAdd);
+$("asearch").addEventListener("input",onAsearch);
+$("asearch").addEventListener("keydown",function(e){
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+    e.preventDefault();
+    if(!addCombo.isOpen()){ if(this.value.trim().length>=2&&!ui.pick){runSearch();} return; }
+    addCombo.move(e.key==="ArrowDown"?1:-1);
+  }
+  else if(e.key==="Enter"){
+    e.preventDefault();
+    if(addCombo.isOpen()) addCombo.pickAct(); else doAdd();
+  }
+});
+$("aamt").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doAdd();}});
+$("chlist").addEventListener("keydown",function(e){
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();chCombo.move(e.key==="ArrowDown"?1:-1);}
+  else if(e.key==="Enter"){e.preventDefault();chCombo.pickAct();}
+});
+$("undoBtn").addEventListener("click",undo);
+$("toastUndo").addEventListener("click",function(){undo();});
+
+$("expBtn").addEventListener("click",exportCollection);
+$("remindExport").addEventListener("click",exportCollection);
+$("remindX").addEventListener("click",function(){api("POST","/api/ui",{action:"dismiss_reminder"}).then(applyState,failed);});
+function pickCollectionFile(){$("fileIn").value="";$("fileIn").click();}
+$("impBtn").addEventListener("click",pickCollectionFile);
+$("impColl1").addEventListener("click",pickCollectionFile);
+$("fileIn").addEventListener("change",function(e){readCollectionFile(e.target.files&&e.target.files[0]);});
+$("mReplace").addEventListener("click",function(){applyCollection("replace");});
+$("mAdd").addEventListener("click",function(){applyCollection("add");});
+$("mCancel").addEventListener("click",closeModal);
+$("infoOk").addEventListener("click",function(){$("info").hidden=true;});
+$("modal").addEventListener("keydown",function(e){
+  if(e.key==="Tab"){
+    var b=[$("mReplace"),$("mAdd"),$("mCancel")], i=b.indexOf(document.activeElement);
+    e.preventDefault(); b[(i+(e.shiftKey?-1:1)+3)%3].focus();
+  }
+});
+
+function pickShopFile(){$("shopIn").value="";$("shopIn").click();}
+$("drop").addEventListener("click",pickShopFile);
+$("drop").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pickShopFile();}});
+$("shopIn").addEventListener("change",function(e){handleShopFile(e.target.files&&e.target.files[0]);});
+["dragenter","dragover"].forEach(function(ev){$("drop").addEventListener(ev,function(e){e.preventDefault();$("drop").classList.add("over");});});
+["dragleave","drop"].forEach(function(ev){$("drop").addEventListener(ev,function(e){
+  e.preventDefault();$("drop").classList.remove("over");
+  if(ev==="drop") handleShopFile(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]);
+});});
+$("update").addEventListener("click",startUpdate);
+
+function openSettings(){$("setpanel").hidden=false;$("gear").setAttribute("aria-expanded","true");renderSettings();$("setSize").focus();}
+function closeSettings(){$("setpanel").hidden=true;$("gear").setAttribute("aria-expanded","false");}
+$("gear").addEventListener("click",function(){if($("setpanel").hidden)openSettings();else closeSettings();});
+$("closeSet").addEventListener("click",function(){closeSettings();$("gear").focus();});
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Escape") return;
+  if(!$("info").hidden){$("info").hidden=true;return;}
+  if(!$("modal").hidden){closeModal();return;}
+  if(!$("chpop").hidden){closeChange();return;}
+  if(!$("addrow").hidden&&$("addrow").contains(document.activeElement)){closeAdd();$("addBtn").focus();return;}
+  if(!$("setpanel").hidden){closeSettings();$("gear").focus();}
+});
+[["setSize","bag_size",function(v){return Math.round(v);}],["setFee","bag_fee",function(v){return Math.round(v*100);}],
+ ["setEX","ex_share",Math.round],["setVG","vg_share",Math.round],["setCredit","credit_bonus",Math.round]].forEach(function(a){
+  $(a[0]).addEventListener("change",function(e){
+    var v=parseFloat(e.target.value);
+    if(isNaN(v)||v<0){renderSettings();return;}
+    var body={}; body[a[1]]=a[2](v);
+    api("POST","/api/settings",body).then(applyState,function(err){failed(err);api("GET","/api/state").then(applyState);});
+  });
+});
+$("setReset").addEventListener("click",function(){api("POST","/api/settings/reset").then(function(j){applyState(j);toast("Settings reset.");},failed);});
+
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);try{localStorage.setItem("sk-theme",t);}catch(e){}}
+try{var savedTheme=localStorage.getItem("sk-theme");if(savedTheme==="light"||savedTheme==="dark")document.documentElement.setAttribute("data-theme",savedTheme);}catch(e){}
+$("theme").addEventListener("click",function(){setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");});
+
+// start: Step 1 when there are no cards, else Step 2
+api("GET","/api/state").then(function(s){
+  applyState(s);
+  goStep(s.rows.length?2:1,true);
+  if(s.update&&s.update.running){UPD=s.update;renderHeader();poll();}
+},function(e){
+  $("status").textContent="Scammer's Kingdom could not load your data. "+e.message;
+});
+})();
+</script>
+</body>
+</html>
