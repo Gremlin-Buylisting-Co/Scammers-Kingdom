@@ -185,7 +185,7 @@ input.sm{width:84px;min-height:44px}
 .pl{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:min(340px,50vh);overflow-y:auto;margin:0;padding:4px;list-style:none;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--pop);z-index:15}
 .pl[hidden]{display:none}
 .pl li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:8px 10px;border-radius:8px;cursor:pointer;border-left:3px solid transparent}
-.pl li.act{background:var(--panel2);border-left-color:var(--accent)}
+.pl li.hl{background:var(--panel2);border-left-color:var(--accent)}
 .pl li[aria-disabled="true"]{cursor:default;color:var(--muted)}
 .o-name{font-weight:600}
 .o-meta{color:var(--muted);font-size:14px}
@@ -863,7 +863,7 @@ function optHtml(ulId,p,k,cur){
 function makeCombo(ul,anchor,onPick,owner){
   var c={items:[],act:-1,cur:null,lastK:-1};
   function mark(scroll){
-    Array.prototype.forEach.call(ul.children,function(li,k){li.classList.toggle("act",k===c.act);li.setAttribute("aria-selected",k===c.act?"true":"false");});
+    Array.prototype.forEach.call(ul.children,function(li,k){li.classList.toggle("hl",k===c.act);li.setAttribute("aria-selected",k===c.act?"true":"false");});
     if(owner&&c.act>=0) owner.setAttribute("aria-activedescendant",ul.id+"-"+c.act);
     var li=ul.children[c.act]; if(scroll&&li&&li.scrollIntoView) li.scrollIntoView({block:"nearest"});
   }

@@ -152,7 +152,7 @@ def server_tests(h):
 
     # the newer-version line
     app5, _ = make_app(h)
-    tag = {"v": "v1.0.1"}
+    tag = {"v": "v99.0.0"}          # any version newer than the running one
     calls = []
 
     def gh(url, headers=None):
@@ -163,10 +163,10 @@ def server_tests(h):
     app5.check_for_new_version()
     h.eq(calls, ["https://api.github.com/repos/Gremlin-Buylisting-Co/Scammers-Kingdom/releases/latest"], "asks GitHub for the latest release")
     nv = call(app5, "GET", "/api/state")[1]["new_version"]
-    h.ok(nv and nv["tag"] == "v1.0.1" and nv["url"].startswith("https://github.com/Gremlin-Buylisting-Co/"), "a newer tag gives the header line its link")
+    h.ok(nv and nv["tag"] == "v99.0.0" and nv["url"].startswith("https://github.com/Gremlin-Buylisting-Co/"), "a newer tag gives the header line its link")
     app5.check_for_new_version()
     h.eq(len(calls), 1, "at most once a day")
-    tag["v"] = "v1.0.0"
+    tag["v"] = "v" + APP_VERSION
     app5.check_for_new_version(force=True)
     h.eq(call(app5, "GET", "/api/state")[1]["new_version"], None, "the same version shows nothing")
     h.ok(updates.is_newer("v1.10.0", "1.9.9") and not updates.is_newer("1.0", "1.0.0") and not updates.is_newer("junk", "1.0.0"), "version comparison")
@@ -378,7 +378,7 @@ def docs_tests(h):
     h.ok("https://www.cardkingdom.com/static/csvImport" in readme, "README links Card Kingdom's CSV import page where the CK import file is described")
     h.ok("CK import file" in readme, "README describes the CK import file")
     h.ok(read("CHANGELOG.md").lstrip().startswith("# Changelog") and "1.0.0" in read("CHANGELOG.md"), "CHANGELOG has 1.0.0")
-    h.eq(APP_VERSION, "1.0.0", "APP_VERSION is 1.0.0")
+    h.ok(re.fullmatch(r"\d+\.\d+\.\d+", APP_VERSION) is not None and ("## " + APP_VERSION) in read("CHANGELOG.md"), "APP_VERSION is a version number and has a CHANGELOG entry")
     bat = read("build_exe.bat")
     h.ok("PyInstaller" in bat and "--onefile" in bat and "--console" in bat and "static" in bat, "build_exe.bat: PyInstaller one file, console, with the page")
     h.ok("pip install" in bat or "pip install" in bat.lower(), "build_exe.bat says how to get PyInstaller if it is missing")

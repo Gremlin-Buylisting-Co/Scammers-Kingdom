@@ -159,6 +159,10 @@ def money(c):
 
 def page_tests(h):
     h.section("PAGE")
+    src = open(os.path.join(ROOT, "static", "index.html"), encoding="utf-8").read()
+    # 1.0.1: the search list's highlighted option must not use the row-action class "act" (invisible until hovered, with padding): the option vanished and the list shifted under the mouse
+    h.ok('toggle("hl"' in src and '.pl li.hl{' in src and 'toggle("act"' not in src and ".pl li.act" not in src,
+         "the search list highlights the option under the mouse with its own class, not the row-action links' hidden style")
     if not NODE:
         h.skip("node is not installed: PAGE needs it")
         return

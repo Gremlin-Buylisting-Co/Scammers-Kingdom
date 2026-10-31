@@ -23,7 +23,7 @@ def ck_tests(h):
     h.eq(net.ck_calls, 1, "one request for the whole list")
     req = net.last_ck_request
     h.eq(req.full_url, "https://api.cardkingdom.com/api/v2/pricelist", "the pricelist address")
-    h.eq(req.get_header("User-agent"), "ScammersKingdom/1.0.0", "a plain User-Agent with the version")
+    h.eq(req.get_header("User-agent"), "ScammersKingdom/" + __import__("appinfo").APP_VERSION, "a plain User-Agent with the version")
     h.ok("gzip" in (req.get_header("Accept-encoding") or ""), "gzip is accepted")
     h.ok(all("|" in k and k.split("|")[1] in ("nonfoil", "foil", "etched") for k in rows), "keys are '<scryfall id>|<finish>'")
     h.ok(not any(e["name"] == "Token" for e in rows.values()), "rows without a Scryfall id are dropped")
@@ -146,7 +146,7 @@ def market_tests(h):
         seen["req"], seen["timeout"] = req, timeout
         return R()
     netutil.post_json("https://api.scryfall.com/cards/collection", {"identifiers": []}, opener=opener)
-    h.eq(seen["req"].get_header("User-agent"), "ScammersKingdom/1.0.0", "User-Agent: ScammersKingdom/<version>")
+    h.eq(seen["req"].get_header("User-agent"), "ScammersKingdom/" + __import__("appinfo").APP_VERSION, "User-Agent: ScammersKingdom/<version>")
     h.eq(seen["req"].get_header("Accept"), "application/json", "Accept: application/json")
     h.eq(seen["req"].get_method(), "POST", "a POST")
     h.ok(seen["timeout"], "with a timeout")

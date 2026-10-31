@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Fix: in the + Add a card search, the option under the mouse turned invisible and the list jumped around. It now just highlights.
+
 ## 1.0.0
 
 First version.
