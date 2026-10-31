@@ -69,6 +69,10 @@ class App:
         self.sleep = time.sleep
         self.clock = lambda: datetime.now().astimezone()
         self.update = {"running": False, "message": "", "result": None}
+        self.lookup = {"running": False, "count": 0, "message": "", "error": None}
+        self.auto_lookup = True      # look up new cards on Scryfall right after an import or an add
+        self._lookup_thread = None
+        self._lookup_again = False
         self.warnings = []
         self._index = None
         self._load()
@@ -153,7 +157,7 @@ class App:
                          "line_dismissed": bool(self.state["back_line_dismissed"])},
                 "undo": {"count": len(hist), "label": hist[-1]["label"] if hist else None},
                 "remind": self.remind_due(), "new_version": self.new_version(),
-                "update": dict(self.update), "warnings": list(self.warnings),
+                "update": dict(self.update), "lookup": dict(self.lookup), "warnings": list(self.warnings),
             }
         if extra:
             out.update(extra)
@@ -189,6 +193,8 @@ class App:
             label = self.binder.edit(payload, self.ck_rows(), self.mk)
             if label:
                 self._after_binder_change()
+                if payload.get("op") == "printing":
+                    self.schedule_lookup()
             return self.snapshot({"label": label})
 
     def add(self, payload):
@@ -200,7 +206,9 @@ class App:
                                          self.ck_rows(), self.mk)
             self._after_binder_change()
             sid = str(payload.get("sid", "")).lower()
-            return self.snapshot({"label": label, "need_market": sid not in self.mk.by_id})
+            need = sid not in self.mk.by_id
+            self.schedule_lookup()
+            return self.snapshot({"label": label, "need_market": need})
 
     def undo(self):
         with self.lock:
@@ -253,6 +261,7 @@ class App:
                 "skipped": parsed["skipped"][:200], "skipped_count": len(parsed["skipped"]),
                 "other_copies": sum(o["qty"] for o in parsed["other_language"])}
             self._after_binder_change()
+            self.schedule_lookup()
             return self.snapshot({"label": res["label"], "skipped": parsed["skipped"][:200]})
 
     def import_collection(self, text, mode):
@@ -266,6 +275,7 @@ class App:
                 raise collection.BadFile("That file has no cards in it.")
             res = self.binder.import_collection(parsed, mode, self.mk)
             self._after_binder_change()
+            self.schedule_lookup()
             return self.snapshot({"label": res["label"], "unplaceable": parsed["unplaceable"][:200],
                                   "unplaceable_count": len(parsed["unplaceable"])})
 
@@ -354,6 +364,73 @@ class App:
                 self.update = {"running": False, "message": "",
                                "result": {"ok": not problems, "lines": problems or lines,
                                           "at": self.clock().isoformat(timespec="seconds")}}
+                if not problems:
+                    self.lookup = dict(self.lookup, error=None)
+            self.schedule_lookup()   # cards added while the update ran
+
+    # ---------- looking up new cards ----------
+
+    def pending_printings(self):
+        """Printings in the binder with no market entry yet (and that Scryfall has not already said it cannot find)."""
+        with self.lock:
+            rows = [r for r in self.binder.rows
+                    if market_mod.row_key(r) and self.mk.entry_for(r) is None
+                    and market_mod.row_key(r) not in self.mk.missing]
+            return market_mod.identifiers(rows)
+
+    def schedule_lookup(self):
+        """After an import or an add: ask Scryfall, in the background, only for printings that
+        have no market entry (so no Scryfall id or price yet). CK's list is never downloaded again for this."""
+        if not self.auto_lookup:
+            return None
+        with self.lock:
+            if self.update["running"] or self.lookup["running"]:
+                self._lookup_again = True
+                return None
+            idents = self.pending_printings()
+            if not idents:
+                return None
+            n = len(idents)
+            self.lookup = {"running": True, "count": n, "error": None,
+                           "message": "Getting market prices for %d new card%s..." % (n, "" if n == 1 else "s")}
+            self._lookup_thread = threading.Thread(target=self.run_lookup, args=(idents,), daemon=True)
+            self._lookup_thread.start()
+            return self._lookup_thread
+
+    def wait_lookup(self, timeout=10):
+        t = self._lookup_thread
+        while t is not None:
+            t.join(timeout)
+            if t is self._lookup_thread:
+                break
+            t = self._lookup_thread
+
+    def run_lookup(self, idents):
+        error = None
+        try:
+            result = market_mod.fetch(idents, self.scryfall_post, self.sleep)
+            with self.lock:
+                wanted = set(market_mod.identifiers(self.binder.rows)) | set(idents)
+                self.mk.merge(result, wanted, touch=False)
+                market_mod.save(self.prices_dir, self.mk)
+                for r in self.binder.rows:
+                    if not r["sid"]:
+                        e = self.mk.entry_for(r)
+                        if e and e.get("id"):
+                            r["sid"] = e["id"]
+                self._save_collection()
+            if result["error"]:
+                error = result["error"]
+        except Exception as exc:
+            error = _plain(exc)
+        with self.lock:
+            n = len(idents)
+            msg = None if not error else ("Market prices for %d card%s could not be fetched. "
+                                          "Press Update prices to try again." % (n, "" if n == 1 else "s"))
+            self.lookup = {"running": False, "count": n, "message": "", "error": msg}
+            again, self._lookup_again = self._lookup_again, False
+        if again and not error:
+            self.schedule_lookup()
 
     def _find_back(self, before, after):
         """Cards in the binder that CK was not buying at the last update and is buying now."""
@@ -438,6 +515,9 @@ class App:
             if path == "/api/update/status":
                 with self.lock:
                     return jresp(dict(self.update))
+            if path == "/api/lookup/status":
+                with self.lock:
+                    return jresp(dict(self.lookup))
             if path == "/download/collection.csv":
                 text, _n = self.export_collection()
                 return self._file(text, "scammers-kingdom-collection-%s.csv")

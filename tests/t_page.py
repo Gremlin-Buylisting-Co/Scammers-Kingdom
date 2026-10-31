@@ -278,6 +278,31 @@ def page_tests(h):
     urls = [c["url"] for c in r[4] if c["method"] == "POST"]
     h.eq(urls, ["/api/import/collection?mode=check", "/api/import/collection?mode=replace"], "the file is checked first, then the choice is sent to the program")
     h.eq(r[5], True, "the question closes")
+    # new cards are being looked up: 'looking up' instead of 'not buying'; no CK prices: say to press Update prices
+    waiting = [dict(srow(1, "Fresh", cash=None, mk=None), unresolved=True), srow(2, "Known", cash=50)]
+    st4 = base_state(h, waiting)
+    st4["lookup"] = {"running": True, "count": 1, "message": "Getting market prices for 1 new card...", "error": None}
+    r = node({"mode": "page", "state": st4, "responses": {"GET /api/lookup/status": {"running": True}}, "steps": [
+        {"op": "read", "id": "tbody", "prop": "innerHTML"}, {"op": "read", "id": "summary", "prop": "textContent"},
+        {"op": "read", "id": "status", "prop": "textContent"}]})["results"]
+    h.ok("Fresh" in r[0] and "looking up\u2026" in r[0] and r[0].count("not buying") == 0, "a card still being looked up shows 'looking up...', not 'not buying'")
+    h.eq(r[1], "Getting market prices for 1 new card...", "the summary says new cards are being looked up, not 'CK is buying 0'")
+    h.eq(r[2], "Getting market prices for 1 new card...", "the header says so too")
+    st5 = base_state(h, waiting)
+    st5["lookup"] = {"running": False, "count": 1, "message": "", "error": "Market prices for 1 card could not be fetched. Press Update prices to try again."}
+    r = node({"mode": "page", "state": st5, "steps": [
+        {"op": "read", "id": "tbody", "prop": "innerHTML"}, {"op": "read", "id": "warnText", "prop": "textContent"},
+        {"op": "read", "id": "warn", "prop": "hidden"}]})["results"]
+    h.ok("not looked up" in r[0], "after a failed lookup the card says 'not looked up'")
+    h.eq((r[1], r[2]), ("Market prices for 1 card could not be fetched. Press Update prices to try again.", False), "the failure is one plain line")
+    st6 = base_state(h, [srow(1, "Fresh", cash=None, mk=None)], has_ck=False)
+    r = node({"mode": "page", "state": st6, "steps": [
+        {"op": "read", "id": "p2empty", "prop": "innerHTML"}, {"op": "read", "id": "p2body", "prop": "hidden"}]})["results"]
+    h.ok("Press <b>Update prices</b> to see what Card Kingdom pays" in r[0], "with no CK prices the binder says to press Update prices to see what Card Kingdom pays")
+    h.ok("CK is buying" not in r[0] and r[1] is True, "...and does not say 'CK is buying 0 of N'")
+    r = node({"mode": "page", "state": base_state(h, waiting), "steps": [
+        {"op": "read", "id": "showing", "prop": "textContent"}]})["results"]
+    h.eq(r[0], "Showing 2 of 2 cards", "cards still unresolved stay visible under 'Only cards CK is buying'")
     # the back-on-the-buylist alert
     brows = [srow(1, "Old", cash=50), srow(2, "Returned", cash=60, back=True), srow(3, "Returned Too", cash=70, back=True)]
     r = node({"mode": "page", "state": base_state(h, brows), "steps": [

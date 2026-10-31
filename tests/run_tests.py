@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from harness import H  # noqa: E402
 import t_core  # noqa: E402
+import t_lookup  # noqa: E402
 import t_page  # noqa: E402
 import t_prices  # noqa: E402
 import t_server  # noqa: E402
@@ -23,6 +24,7 @@ ORDER = [
     t_prices.market_tests,
     t_prices.back_tests,
     t_prices.plan_tests,
+    t_lookup.lookup_tests,
     t_server.server_tests,
     t_page.page_tests,
     t_server.public_tests,

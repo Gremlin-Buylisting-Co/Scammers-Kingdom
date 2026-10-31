@@ -30,7 +30,7 @@ Your binder, settings and prices are kept on your own PC in a folder called `Sca
 
 ## What the tool talks to
 
-Prices come from Card Kingdom's buylist and from the TCGplayer market price, which the tool gets through Scryfall. It makes those requests only when you press **Update prices**. Once a day it also asks GitHub whether a newer version exists, and shows a line if there is one (it never downloads anything by itself). It talks to nothing else. Card pictures that appear when you hover over a card are loaded by your browser straight from Scryfall.
+Prices come from Card Kingdom's buylist and from the TCGplayer market price, which the tool gets through Scryfall. It downloads Card Kingdom's buylist only when you press **Update prices**. Right after you import or add cards, it also asks Scryfall for the market price of just the new cards. Once a day it also asks GitHub whether a newer version exists, and shows a line if there is one (it never downloads anything by itself). It talks to nothing else. Card pictures that appear when you hover over a card are loaded by your browser straight from Scryfall.
 
 Not affiliated with Card Kingdom.
 

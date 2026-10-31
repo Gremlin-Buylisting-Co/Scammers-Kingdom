@@ -97,9 +97,10 @@ class H:
 
 # ---- calling the program
 
-def make_app(h, folder=None, net=None, check_updates=False):
+def make_app(h, folder=None, net=None, check_updates=False, auto_lookup=False):
     import server
     app = server.App(folder or h.tmp(), check_updates=check_updates)
+    app.auto_lookup = auto_lookup      # most tests drive prices by hand; the LOOKUP tests turn this on
     net = net or fixtures.FakeNet()
     app.ck_opener, app.scryfall_post, app.sleep = net.ck_opener, net.scryfall_post, net.sleep
     return app, net

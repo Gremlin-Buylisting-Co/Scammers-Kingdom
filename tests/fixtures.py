@@ -142,6 +142,7 @@ class FakeNet:
         self.ck_gate = None
         self.scry_calls = []
         self.scry_error_at = None
+        self.scry_gate = None
         self.sleeps = []
         self.gz = False
 
@@ -158,6 +159,8 @@ class FakeNet:
         from netutil import NetError
         n = len(self.scry_calls)
         self.scry_calls.append((url, payload))
+        if self.scry_gate:
+            self.scry_gate()
         if self.scry_error_at is not None and n >= self.scry_error_at:
             raise NetError("no internet connection, or the site could not be reached")
         return scry_answer(payload["identifiers"])

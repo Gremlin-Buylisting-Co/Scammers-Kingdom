@@ -152,15 +152,16 @@ class Cache:
         k = row_key(row)
         return bool(k) and k in self.missing and self.entry_for(row) is None
 
-    def merge(self, result, wanted_keys):
-        """Fold a fetch result in. Only printings still in the binder are kept."""
+    def merge(self, result, wanted_keys, touch=True):
+        """Fold a fetch result in. Only printings still in the binder are kept.
+        `touch=False` leaves the date of the last full update alone (a small lookup for new cards)."""
         entries = {k: v for k, v in self.entries.items() if k in wanted_keys}
         entries.update(result["entries"])
         missing = {k for k in self.missing if k in wanted_keys and k not in result["entries"]}
         missing.update(k for k in result["missing"] if k in wanted_keys)
         self.entries, self.missing = entries, missing
         self._by_id = None
-        if not result["error"] or not self.as_of:
+        if (touch and not result["error"]) or not self.as_of:
             self.as_of = now_iso()
 
     def to_json(self):

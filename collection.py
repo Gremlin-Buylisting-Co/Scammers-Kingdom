@@ -511,6 +511,7 @@ def view_rows(rows, ck_rows, mk, back_keys=()):
             "mk": price, "mk_src": src,
             "back": bool(buying and key in back_keys),
             "unknown": mk.is_unknown(r),
+            "unresolved": bool(market_mod.row_key(r)) and e is None and market_mod.row_key(r) not in mk.missing,
             "link": ck_prices.buylist_url(ck["name"], r["finish"], ck["url"]) if buying else None,
         })
     return out

@@ -501,7 +501,7 @@ function matches(r,q){
 }
 function visibleRows(ranked,o){
   return ranked.filter(function(x){
-    if(o.only&&!x.buying) return false;
+    if(o.only&&!x.buying&&!x.r.unresolved) return false;   // cards still being looked up stay visible
     if(o.backOnly&&!x.r.back) return false;
     if(o.handOnly&&x.r.src!=="hand") return false;
     return matches(x.r,o.q||"");
@@ -599,6 +599,19 @@ function applyState(s){
   var ids={}; ROWS.forEach(function(r){ids[r.id]=1;});
   Object.keys(sel).forEach(function(k){if(!ids[k]) delete sel[k];});
   renderAll();
+  if(s.lookup&&s.lookup.running) pollLookup();
+}
+// new cards are looked up on Scryfall in the background; redraw when that finishes
+var lkPoll=false;
+function pollLookup(){
+  if(lkPoll) return; lkPoll=true;
+  (function tick(){
+    api("GET","/api/lookup/status").then(function(l){
+      if(l.running){setTimeout(tick,600);return;}
+      lkPoll=false;
+      api("GET","/api/state").then(applyState,function(){});
+    },function(){lkPoll=false;});
+  })();
 }
 function failed(e){
   toast(e.message||"Something went wrong.",false,7000);
@@ -623,6 +636,7 @@ function undo(){
 function renderHeader(){
   var p=STATE.prices, st=$("status");
   if(UPD&&UPD.running) st.textContent=UPD.message||"Updating...";
+  else if(STATE.lookup&&STATE.lookup.running) st.textContent=STATE.lookup.message;
   else if(!p.has_ck) st.innerHTML="No prices yet. Press <b>Update prices</b> (about 1 minute).";
   else{
     var stamps=[p.ck_as_of,p.market_as_of].filter(Boolean).sort();
@@ -634,7 +648,8 @@ function renderHeader(){
   a.hidden=!href; if(href) a.href=href;
   var up=$("update"); up.disabled=!!(UPD&&UPD.running); up.textContent=up.disabled?"Updating...":"Update prices";
   $("ver").textContent="Version "+STATE.version;
-  var w=$("warn"); w.hidden=!(STATE.warnings&&STATE.warnings.length); $("warnText").textContent=(STATE.warnings||[]).join(" ");
+  var wl=(STATE.warnings||[]).slice(); if(STATE.lookup&&STATE.lookup.error) wl.push(STATE.lookup.error);
+  var w=$("warn"); w.hidden=!wl.length; $("warnText").textContent=wl.join(" ");
   $("remind").hidden=!STATE.remind;
   $("undoBtn").disabled=!STATE.undo.count;
   $("undoBtn").title=STATE.undo.count?"Undo: "+STATE.undo.label:"Nothing to undo";
@@ -710,7 +725,7 @@ function renderCards(){
     pageIds=[]; LIST=[];
     emptyMsg($("p2empty"),$("p2body"),
       !hc&&!hp?'No cards yet.<br><button class="btn" type="button" data-go="1">Add your cards</button>':
-      !hp?'Your cards are in. Press <b>Update prices</b> at the top to see what CK pays.':
+      !hp?'Your cards are in. Press <b>Update prices</b> to see what Card Kingdom pays.':
       'Your binder is empty. Use <b>+ Add a card</b> above, or <button class="link" type="button" data-go="1">import an export</button>.');
     return;
   }
@@ -719,7 +734,9 @@ function renderCards(){
   var tot=0, buyCopies=0, cash=0, cred=0, nb=STATE.back.count, nh=0;
   ROWS.forEach(function(r){tot+=r.qty;if(r.src==="hand")nh+=r.qty;});
   RANKED.forEach(function(x){if(x.buying){buyCopies+=x.copies;cash+=x.copies*x.cash;cred+=x.copies*x.credit;}});
-  $("summary").innerHTML="CK is buying <b>"+num(buyCopies)+" of your "+num(tot)+" cards</b>: <b>"+money(cash)+" cash</b> or <b>"+money(cred)+" credit</b>.";
+  var looking=!!(STATE.lookup&&STATE.lookup.running);
+  if(looking) $("summary").textContent=STATE.lookup.message;
+  else $("summary").innerHTML="CK is buying <b>"+num(buyCopies)+" of your "+num(tot)+" cards</b>: <b>"+money(cash)+" cash</b> or <b>"+money(cred)+" credit</b>.";
 
   $("alert").hidden=!(nb>0&&!STATE.back.line_dismissed);
   $("alertText").innerHTML=nb+" of your cards are back on CK's buylist since your last update (<button class=\"link\" type=\"button\" id=\"alertShow\">show them</button>)";
@@ -749,12 +766,13 @@ function renderCards(){
   }
   $("tbody").innerHTML=pg.rows.map(function(x){
     var r=x.r, b=x.buying, k=band(x.pct), id=r.id, nm=esc(r.name);
-    var pctHtml;
-    if(!b) pctHtml=r.unknown?'<div class="pct n"><small>Card not found</small></div>':'<div class="pct n"><small>not buying</small></div>';
+    var pctHtml, lk=r.unresolved?(looking?"looking up…":"not looked up"):"";
+    if(r.unresolved&&(!b||x.pct===null)) pctHtml='<div class="pct n"><small>'+lk+'</small></div>';
+    else if(!b) pctHtml=r.unknown?'<div class="pct n"><small>Card not found</small></div>':'<div class="pct n"><small>not buying</small></div>';
     else if(x.pct===null) pctHtml='<div class="pct n"><small>no market price</small></div>';
     else pctHtml='<div class="pct '+k+'">'+Math.round(x.pct)+'%<div class="meter"><i style="width:'+Math.min(100,x.pct)+'%"></i></div></div>';
     var wants=!b?'<span class="dash">&mdash;</span>':'<span class="wants">CK wants '+r.ck.wants+'</span>';
-    var mk=r.mk===null||r.mk===undefined?'<span class="noprice">no market price</span>':money(r.mk)+(r.mk_src==="scan"?' <span class="cmeta" title="Price from your scan. Press Update prices for the current one.">(scan)</span>':'');
+    var mk=r.mk===null||r.mk===undefined?'<span class="noprice">'+(r.unresolved?lk:'no market price')+'</span>':money(r.mk)+(r.mk_src==="scan"?' <span class="cmeta" title="Price from your scan. Press Update prices for the current one.">(scan)</span>':'');
     return '<tr class="'+(b?'':'off ')+(sel[id]?'sel':'')+'" data-id="'+id+'">'+
       '<td class="cardcell"><div class="cc"><input type="checkbox" class="rowchk" data-id="'+id+'"'+(sel[id]?' checked':'')+' aria-label="Select '+nm+'"><div>'+
         '<div class="nameline"><span class="cname" data-id="'+id+'">'+nm+'</span>'+foilTag(r)+(r.back?'<span class="tag back">Back</span>':'')+(r.src==="hand"?'<span class="tag hand">Added by hand</span>':'')+

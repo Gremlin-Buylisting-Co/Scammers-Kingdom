@@ -63,6 +63,12 @@ MUTATIONS = [
     ("static/index.html", "var fee=S.bag_fee, g=Math.max(0,value-fee);", "var fee=S.bag_fee, g=value;", "the page forgets the bag fee"),
     ("static/index.html", "rel=\"noopener noreferrer\">Sell on CK</a>'", "\">Sell on CK</a>'", "Sell on CK link without rel"),
     ("static/index.html", "if(!an&&a.pct!==b.pct) return b.pct-a.pct;", "if(!an&&a.pct!==b.pct) return a.pct-b.pct;", "the page ranks worst first"),
+    ("server.py", '            self.schedule_lookup()\n            return self.snapshot({"label": res["label"], "skipped"', '            return self.snapshot({"label": res["label"], "skipped"', "no lookup after a shoptcg.online import"),
+    ("server.py", '            self.schedule_lookup()\n            return self.snapshot({"label": res["label"], "unplaceable"', '            return self.snapshot({"label": res["label"], "unplaceable"', "no lookup after Import My Collection"),
+    ("server.py", '            self.schedule_lookup()\n            return self.snapshot({"label": label, "need_market": need})', '            return self.snapshot({"label": label, "need_market": need})', "no lookup after a hand add"),
+    ("server.py", "and self.mk.entry_for(r) is None\n", "and True\n", "the lookup asks for printings it already knows"),
+    ("static/index.html", "if(o.only&&!x.buying&&!x.r.unresolved) return false;", "if(o.only&&!x.buying) return false;", "cards being looked up are hidden"),
+    ("static/index.html", "to see what Card Kingdom pays.", "to see what CK pays.", "wording when there are no CK prices"),
     ("static/index.html", "Not affiliated with Card Kingdom.", "", "footer text missing"),
 ]
 
