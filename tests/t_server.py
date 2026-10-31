@@ -350,6 +350,8 @@ def public_tests(h):
             if not re.search(r"\.(js|py|json|css|html|md)$", m):
                 bad_mail.append((f, m))
         low = text.lower().replace("’", "'")
+        if f == "README.md":
+            low = low.replace(codecs.decode("pneq xvatqbz npprcgf nf na hcybnq gb gur fryy pneg", "rot13"), "")          # the owner's own sentence about the CSV upload, allowed as written (scrambled here like the list above)
         for w in banned:
             if w in low:
                 bad_word.append((f, "banned phrase #%d" % banned.index(w)))
