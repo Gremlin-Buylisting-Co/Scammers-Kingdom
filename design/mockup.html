@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scammer's Kingdom</title>
+<style>
+:root{
+  --bg:#12151c; --panel:#1a1f2d; --panel2:#222839; --text:#e9ecf3; --muted:#9aa3b8; --border:#2c3449;
+  --accent:#6ea2ff; --accent-ink:#0b1630;
+  --green:#3ecf8e; --amber:#f2b632; --grey:#7f889c;
+  --bar:#fde047; --bar-ink:#3b3000;
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+}
+:root[data-theme="light"]{
+  --bg:#f3f5fa; --panel:#ffffff; --panel2:#eef1f8; --text:#1a2030; --muted:#5a647a; --border:#d6dbe8;
+  --accent:#2563eb; --accent-ink:#ffffff;
+  --green:#12804a; --amber:#a86a00; --grey:#677086;
+  --shadow:0 1px 2px rgba(20,30,60,.12);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.mock{background:var(--bar);color:var(--bar-ink);text-align:center;font-size:13px;font-weight:700;padding:4px 12px;letter-spacing:.02em}
+.mock button{background:none;border:0;color:inherit;text-decoration:underline;font:inherit;cursor:pointer;margin-left:10px;font-weight:600}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:12px 0 8px}
+header h1{margin:0;font-size:28px;letter-spacing:-.01em}
+header h1 span{color:var(--accent)}
+.status{color:var(--muted);flex:1 1 260px}
+.status b{color:var(--text);font-weight:600}
+button,select,input{font:inherit;color:inherit}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;min-height:44px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn.ghost:hover{background:var(--panel2)}
+.btn:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.theme{width:44px;padding:0;font-size:18px}
+section.step{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;margin:16px 0;box-shadow:var(--shadow)}
+.step h2{margin:0 0 4px;font-size:20px;display:flex;align-items:center;gap:10px}
+.step h2 i{font-style:normal;background:var(--accent);color:var(--accent-ink);width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:16px;flex:none}
+.sub{color:var(--muted);margin:0 0 14px}
+.drop{border:2px dashed var(--border);border-radius:14px;padding:26px 16px;text-align:center;background:var(--panel2);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent)}
+.drop strong{display:block;font-size:19px;margin-bottom:4px}
+.drop span{color:var(--muted);font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:12px}
+.good{color:var(--green);font-weight:700}
+.link{background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0}
+.hint{color:var(--muted);font-size:14px;margin-top:10px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:8px 14px;cursor:pointer;min-height:40px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.unrec{display:none;margin:10px 0 0;padding:10px 14px;background:var(--panel2);border-radius:10px;color:var(--muted);font-size:14px}
+.unrec.show{display:block}
+.unrec li{margin:2px 0}
+.tools{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;margin-bottom:12px}
+.tools input[type=search]{flex:1 1 200px;min-width:0;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;min-height:44px}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch .tr{width:44px;height:26px;border-radius:13px;background:var(--grey);position:relative;flex:none;transition:background .15s}
+.switch .tr::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked + .tr{background:var(--accent)}
+.switch input:checked + .tr::after{transform:translateX(18px)}
+.switch input:focus-visible + .tr{outline:3px solid var(--accent);outline-offset:2px}
+.summary{background:var(--panel2);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.summary b{color:var(--text)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
+td.num,th.num{text-align:right}
+tr.off td{opacity:.55}
+.cname{font-weight:600}
+.cmeta{color:var(--muted);font-size:13px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);margin-left:6px;vertical-align:1px}
+select.cond{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;min-height:38px}
+.pct{font-size:24px;font-weight:800;line-height:1;text-align:right}
+.pct small{display:block;font-size:12px;font-weight:600;margin-top:2px}
+.meter{height:4px;border-radius:2px;background:var(--border);margin-top:5px;overflow:hidden;min-width:70px}
+.meter i{display:block;height:100%;background:currentColor}
+.g{color:var(--green)} .a{color:var(--amber)} .n{color:var(--grey)}
+.wants{font-size:13px;color:var(--amber);font-weight:600}
+.dash{color:var(--muted)}
+.plancontrols{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.plancontrols label.q{font-weight:600}
+input.num{width:80px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-height:44px;text-align:center;font-size:18px;font-weight:700}
+.why{color:var(--muted);font-size:14px;margin:12px 0}
+.bag{border:1px solid var(--border);border-radius:12px;margin:10px 0;background:var(--panel2)}
+.bag summary{padding:12px 14px;cursor:pointer;font-weight:600;list-style:none;display:flex;gap:8px;align-items:baseline}
+.bag summary::-webkit-details-marker{display:none}
+.bag summary::before{content:"\25B8";color:var(--accent);flex:none}
+.bag[open] summary::before{content:"\25BE"}
+.bag .detail{padding:0 14px 12px;overflow-x:auto}
+.bag .detail table td,.bag .detail table th{padding:6px 8px}
+.fill{color:var(--amber);font-weight:600}
+.total{margin:14px 0 6px;font-size:17px}
+.total b{color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+details.fold{background:var(--panel);border:1px solid var(--border);border-radius:16px;margin:16px 0;box-shadow:var(--shadow)}
+details.fold>summary{padding:16px 20px;cursor:pointer;font-weight:700;font-size:18px}
+details.fold .inner{padding:0 20px 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.field label{display:block;font-weight:600;margin-bottom:4px}
+.field input{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-height:44px}
+.field small{color:var(--muted);display:block;margin-top:4px}
+.notes{background:var(--panel);border:1px dashed var(--accent);border-radius:16px;padding:20px;margin:16px 0}
+.notes h2{margin:0 0 8px;font-size:18px}
+.notes li{margin:6px 0}
+footer{color:var(--muted);font-size:13px;text-align:center;padding:16px 0 40px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:all .2s;font-weight:600;z-index:10;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.empty{padding:20px;text-align:center;color:var(--muted)}
+body.first .hide-first{display:none}
+.show-first{display:none}
+body.first .show-first{display:block}
+.visually{position:absolute;left:-9999px}
+
+@media (max-width:760px){
+  .wrap{padding:12px}
+  header h1{font-size:24px}
+  section.step{padding:16px}
+  table.cards thead{display:none}
+  table.cards,table.cards tbody,table.cards tr,table.cards td{display:block;width:100%}
+  table.cards tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--panel2)}
+  table.cards td{border:0;padding:4px 0;text-align:left!important}
+  table.cards td.cardcell{grid-column:1 / -1;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  table.cards td.pctcell{order:-1}
+  table.cards td[data-l]::before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  table.cards td.cardcell::before{display:none}
+  .pct{text-align:left}
+  .cardcell .pctbox{min-width:84px;text-align:right}
+}
+</style>
+</head>
+<body>
+<div class="mock">MOCKUP: made-up cards and prices <button type="button" id="firstToggle">show first-visit view</button></div>
+<div class="wrap">
+
+<header>
+  <h1>Scammer's <span>Kingdom</span></h1>
+  <div class="status" id="status" aria-live="polite"></div>
+  <button class="btn" id="update" type="button">Update prices</button>
+  <button class="btn ghost theme" id="theme" type="button" aria-label="Switch between dark and light theme" title="Dark / light">&#9788;</button>
+</header>
+
+<section class="step" id="s1">
+  <h2><i>1</i> Add your cards</h2>
+  <p class="sub">Scan your cards in at shoptcg.online, then bring the export file here.</p>
+  <div class="drop" id="drop" role="button" tabindex="0">
+    <strong>Drop your shoptcg.online export here</strong>
+    <span>or click to pick the file</span>
+  </div>
+  <div class="hide-first">
+    <div class="row">
+      <span class="good" id="importMsg"></span>
+      <button class="link" type="button" id="showUnrec">(show)</button>
+    </div>
+    <ul class="unrec" id="unrec">
+      <li>"Goblin Token" (no set given)</li>
+      <li>"Tropical Isle" (spelling not found)</li>
+      <li>"Command Tower Promo 2019" (set not found)</li>
+      <li>"Xyz test card" (not a Magic card)</li>
+    </ul>
+    <div class="row">
+      <span class="cmeta">When you import:</span>
+      <div class="seg" role="group" aria-label="What to do with the cards already here" id="mode">
+        <button type="button" aria-pressed="false" data-m="replace">Replace what's there</button>
+        <button type="button" aria-pressed="true" data-m="add">Add to what's there</button>
+      </div>
+    </div>
+  </div>
+  <p class="hint">How do I export from shoptcg.online? Open your scanned collection, press Export, and save the file it gives you.</p>
+</section>
+
+<section class="step" id="s2">
+  <h2><i>2</i> Your cards</h2>
+  <p class="sub">Best first. The big number is how much of the market price CK pays you.</p>
+  <div class="hide-first">
+    <div class="tools">
+      <label class="switch"><input type="checkbox" id="onlyBuying" checked><span class="tr"></span><span>Only cards CK is buying</span></label>
+      <input type="search" id="search" placeholder="Search your cards" aria-label="Search your cards">
+    </div>
+    <div class="summary" id="summary"></div>
+    <div class="tablewrap">
+      <table class="cards">
+        <thead><tr>
+          <th>Card</th><th>Condition</th><th class="num">Qty</th>
+          <th class="num">CK pays cash (each)</th><th class="num">CK pays credit (each)</th>
+          <th class="num">Market price</th><th class="num">CK % of market</th><th>CK wants</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="hint"><span class="g"><b>Green</b></span> 70% or more &nbsp; <span class="a"><b>Amber</b></span> 40% to 69% &nbsp; <span class="n"><b>Grey</b></span> under 40% or CK is not buying it. Condition is Near Mint (NM) unless you change it.</p>
+  </div>
+  <div class="empty show-first">No cards yet. Do Step 1 first.</div>
+</section>
+
+<section class="step" id="s3">
+  <h2><i>3</i> Plan a shipment</h2>
+  <p class="sub">Pick how many bags you want to send. We pick the best cards to fill them.</p>
+  <div class="hide-first">
+    <div class="plancontrols">
+      <label class="q" for="bags" id="bagsLabel">How many 50-card bags?</label>
+      <input class="num" type="number" id="bags" min="1" max="20" value="2" inputmode="numeric">
+      <span class="cmeta">Paid in:</span>
+      <div class="seg" role="group" aria-label="Paid in" id="pay">
+        <button type="button" aria-pressed="true" data-p="cash">Cash</button>
+        <button type="button" aria-pressed="false" data-p="credit">Credit</button>
+      </div>
+    </div>
+    <p class="why">Cards CK pays the most for, compared with their market price, go first.</p>
+    <div id="plan"></div>
+    <div class="actions">
+      <button class="btn" type="button" id="copy">Copy list for CK</button>
+      <button class="btn ghost" type="button" id="csv">Download CSV</button>
+    </div>
+  </div>
+  <div class="empty show-first">Add your cards and update prices, then plan your bags here.</div>
+</section>
+
+<details class="fold" id="settings">
+  <summary>Settings</summary>
+  <div class="inner">
+    <div class="grid">
+      <div class="field"><label for="setSize">Cards in a bag</label><input id="setSize" type="number" min="1" value="50"></div>
+      <div class="field"><label for="setFee">Fee per bag ($)</label><input id="setFee" type="number" min="0" step="0.05" value="0.80"><small>Charged for every bag, full or not.</small></div>
+      <div class="field"><label for="setEX">CK pays for EX, as a share of NM (%)</label><input id="setEX" type="number" min="0" max="100" value="80"><small>Estimate: check CK's grading page.</small></div>
+      <div class="field"><label for="setVG">CK pays for VG, as a share of NM (%)</label><input id="setVG" type="number" min="0" max="100" value="60"><small>Estimate: check CK's grading page.</small></div>
+      <div class="field"><label for="setCredit">Credit bonus (%)</label><input id="setCredit" type="number" min="0" max="100" value="30"><small>Extra you get when paid in store credit instead of cash.</small></div>
+    </div>
+  </div>
+</details>
+
+<section class="notes">
+  <h2>Notes for the owner</h2>
+  <p class="cmeta" style="margin-top:0">Choices in this mockup you may want to change. Everything here is easy to adjust.</p>
+  <ul>
+    <li><b>Color thresholds.</b> Green is 70% and up, amber is 40% to 69%, grey is under 40%. These are placeholders. Tell me the cutoffs you would use.</li>
+    <li><b>Columns shown by default.</b> Right now all eight show. On a phone each card becomes a small block. Cash, credit and market price could be hidden behind a "More" link to keep it calmer.</li>
+    <li><b>Cash or credit as the default.</b> The plan starts on Cash. The percent column always compares cash to market price, and ranking is the same either way.</li>
+    <li><b>The EX and VG estimates.</b> 80% and 60% of the NM price are guesses, marked as such in Settings. Please check them against CK's grading page before anyone relies on them.</li>
+    <li><b>Ranking sentence.</b> The line under the plan is worded as you gave it. "What they sell for" could be read as CK's own prices, so we could say "market price" instead.</li>
+    <li><b>Small cards.</b> There is no minimum price. A $0.01 card goes in the plan if it ranks high enough or is needed to fill a bag.</li>
+  </ul>
+</section>
+
+<footer>Prices: Card Kingdom's buylist and TCGplayer market (via Scryfall). Not affiliated with Card Kingdom.</footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+// ---- made-up data. ck = what CK pays for NM, in cents (null = not buying). mk = market price in cents. w = copies CK wants (null = no limit)
+var CARDS=[
+ {n:"Ragavan, Nimble Pilferer",s:"Modern Horizons 2",no:"138",f:0,c:"NM",q:1,mk:3800,ck:2470,w:null},
+ {n:"The One Ring",s:"The Lord of the Rings",no:"246",f:0,c:"NM",q:1,mk:3600,ck:2520,w:null},
+ {n:"Orcish Bowmasters",s:"The Lord of the Rings",no:"103",f:0,c:"NM",q:2,mk:3250,ck:2340,w:2},
+ {n:"Sheoldred, the Apocalypse",s:"Dominaria United",no:"107",f:0,c:"NM",q:1,mk:2800,ck:1700,w:null},
+ {n:"Fable of the Mirror-Breaker",s:"Neon Dynasty",no:"141",f:0,c:"NM",q:3,mk:1400,ck:840,w:4},
+ {n:"Dockside Extortionist",s:"Commander Legends",no:"107",f:0,c:"EX",q:1,mk:900,ck:630,w:null},
+ {n:"Sol Ring",s:"Commander Masters",no:"410",f:1,c:"NM",q:1,mk:650,ck:320,w:null},
+ {n:"Goblin Guide",s:"Zendikar Rising",no:"140",f:1,c:"NM",q:1,mk:450,ck:230,w:null},
+ {n:"Birds of Paradise",s:"Commander Masters",no:"215",f:0,c:"NM",q:3,mk:350,ck:245,w:null},
+ {n:"Swords to Plowshares",s:"Eternal Masters",no:"54",f:0,c:"NM",q:2,mk:300,ck:220,w:null},
+ {n:"Counterspell",s:"Modern Horizons 2",no:"267",f:0,c:"NM",q:3,mk:200,ck:155,w:null},
+ {n:"Lightning Bolt",s:"Magic 2011",no:"149",f:0,c:"NM",q:4,mk:150,ck:90,w:null},
+ {n:"Llanowar Elves",s:"Dominaria United",no:"178",f:1,c:"NM",q:2,mk:120,ck:50,w:null},
+ {n:"Arcane Signet",s:"Commander Legends",no:"297",f:0,c:"NM",q:6,mk:100,ck:55,w:8},
+ {n:"Command Tower",s:"Commander Masters",no:"250",f:0,c:"NM",q:5,mk:60,ck:45,w:null},
+ {n:"Gruul Signet",s:"Ravnica Remastered",no:"255",f:0,c:"NM",q:6,mk:20,ck:15,w:null},
+ {n:"Cultivate",s:"Commander 2021",no:"246",f:0,c:"NM",q:4,mk:35,ck:15,w:null},
+ {n:"Rampant Growth",s:"Commander Legends",no:"302",f:0,c:"NM",q:5,mk:25,ck:10,w:null},
+ {n:"Shock",s:"Dominaria Remastered",no:"128",f:0,c:"NM",q:8,mk:10,ck:8,w:4},
+ {n:"Evolving Wilds",s:"Bloomburrow",no:"254",f:0,c:"NM",q:6,mk:6,ck:4,w:null},
+ {n:"Wastes",s:"Modern Horizons 3",no:"310",f:0,c:"NM",q:3,mk:3,ck:2,w:null},
+ {n:"Forest",s:"Bloomburrow",no:"280",f:0,c:"NM",q:18,mk:2,ck:1,w:null},
+ {n:"Island",s:"Bloomburrow",no:"277",f:0,c:"NM",q:20,mk:3,ck:1,w:12},
+ {n:"Mountain",s:"Duskmourn",no:"278",f:0,c:"NM",q:10,mk:4,ck:1,w:null},
+ {n:"Naturalize",s:"Core Set 2021",no:"195",f:0,c:"NM",q:7,mk:8,ck:1,w:null},
+ {n:"Mystic Remora",s:"Ice Age",no:"84",f:0,c:"NM",q:1,mk:550,ck:null,w:null},
+ {n:"Sakura-Tribe Elder",s:"Modern Horizons 3",no:"186",f:0,c:"NM",q:2,mk:30,ck:null,w:null},
+ {n:"Giant Growth",s:"Magic 2011",no:"175",f:0,c:"NM",q:3,mk:10,ck:null,w:null}
+];
+var UNRECOGNIZED=4;
+var GREEN=70, AMBER=40;               // color thresholds (percent)
+var S={size:50,fee:80,ex:80,vg:60,credit:30}; // fee in cents
+var st={pay:"cash",bags:2,only:true,q:"",first:false,updated:"today, 9:42 am"};
+
+function $(id){return document.getElementById(id);}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function money(c){return "$"+(c/100).toFixed(2);}
+function mult(c){return c==="EX"?S.ex/100:c==="VG"?S.vg/100:1;}
+
+// price of one copy, in cents, for a row
+function calc(r){
+  var out={buying:r.ck!==null,pct:-1,cash:0,credit:0,copies:0};
+  if(!out.buying) return out;
+  out.cash=Math.max(1,Math.round(r.ck*mult(r.c)));
+  out.credit=Math.max(1,Math.round(out.cash*(1+S.credit/100)));
+  out.pct=out.cash/r.mk*100;
+  out.copies=r.w===null?r.q:Math.min(r.q,r.w);
+  return out;
+}
+function band(p){return p>=GREEN?"g":p>=AMBER?"a":"n";}
+function rows(){
+  return CARDS.map(function(r,i){var x=calc(r);x.r=r;x.i=i;return x;});
+}
+function sorted(){
+  return rows().sort(function(a,b){
+    if(a.buying!==b.buying) return a.buying?-1:1;
+    if(b.pct!==a.pct) return b.pct-a.pct;
+    return b.cash-a.cash;
+  });
+}
+
+// ---- status
+function renderStatus(){
+  $("status").innerHTML=st.first?"No prices yet. Press <b>Update prices</b> (about 1 minute).":"Prices from <b>"+esc(st.updated)+"</b>";
+}
+
+// ---- step 2
+function renderCards(){
+  var all=sorted(), tot=0, buyCopies=0, cash=0, cred=0;
+  CARDS.forEach(function(r){tot+=r.q;});
+  all.forEach(function(x){if(x.buying){buyCopies+=x.copies;cash+=x.copies*x.cash;cred+=x.copies*x.credit;}});
+  $("importMsg").textContent=tot+" cards added. "+UNRECOGNIZED+" not recognized";
+  $("summary").innerHTML="CK is buying <b>"+buyCopies+" of your "+tot+" cards</b>: <b>"+money(cash)+" cash</b> or <b>"+money(cred)+" credit</b>.";
+  var q=st.q.trim().toLowerCase();
+  var list=all.filter(function(x){
+    if(st.only&&!x.buying) return false;
+    return !q||x.r.n.toLowerCase().indexOf(q)>-1;
+  });
+  if(!list.length){$("tbody").innerHTML='<tr><td colspan="8" class="empty">No cards match.</td></tr>';return;}
+  $("tbody").innerHTML=list.map(function(x){
+    var r=x.r, b=x.buying, k=band(x.pct);
+    var pctHtml=b?'<div class="pct '+k+'">'+Math.round(x.pct)+'%<div class="meter"><i style="width:'+Math.min(100,x.pct)+'%"></i></div></div>'
+                 :'<div class="pct n"><small>Not buying</small></div>';
+    var wants=!b?'<span class="dash">&mdash;</span>':(r.w===null?'<span class="dash">&mdash;</span>':'<span class="wants">CK wants '+r.w+'</span>');
+    return '<tr class="'+(b?'':'off')+'">'+
+      '<td class="cardcell"><div><div class="cname">'+esc(r.n)+(r.f?'<span class="tag">Foil</span>':'')+'</div><div class="cmeta">'+esc(r.s)+' &middot; #'+esc(r.no)+'</div></div></td>'+
+      '<td data-l="Condition"><select class="cond" data-i="'+x.i+'" aria-label="Condition for '+esc(r.n)+'">'+
+        ["NM","EX","VG"].map(function(c){return '<option'+(c===r.c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></td>'+
+      '<td class="num" data-l="Qty">'+r.q+'</td>'+
+      '<td class="num" data-l="CK pays cash">'+(b?money(x.cash):'<span class="dash">&mdash;</span>')+'</td>'+
+      '<td class="num" data-l="CK pays credit">'+(b?money(x.credit):'<span class="dash">&mdash;</span>')+'</td>'+
+      '<td class="num" data-l="Market price">'+money(r.mk)+'</td>'+
+      '<td class="num pctcell" data-l="CK % of market">'+pctHtml+'</td>'+
+      '<td data-l="CK wants">'+wants+'</td></tr>';
+  }).join('');
+}
+
+// ---- step 3
+var lastPlan=null;
+function buildPlan(){
+  var n=Math.max(1,Math.min(20,parseInt(st.bags,10)||1)), cap=n*S.size;
+  var flat=[];
+  sorted().forEach(function(x){
+    if(!x.buying) return;
+    for(var k=0;k<x.copies;k++) flat.push(x);
+  });
+  var take=flat.slice(0,cap), bags=[];
+  for(var i=0;i<take.length;i+=S.size) bags.push(take.slice(i,i+S.size));
+  return {n:n,cap:cap,bags:bags,taken:take.length,left:flat.length-take.length,avail:flat.length};
+}
+function val(x){return st.pay==="cash"?x.cash:x.credit;}
+function group(copies){
+  var m={}, order=[];
+  copies.forEach(function(x){
+    var key=x.i;
+    if(!m[key]){m[key]={x:x,n:0};order.push(key);}
+    m[key].n++;
+  });
+  return order.map(function(k){return m[k];});
+}
+function renderPlan(){
+  var p=buildPlan(); lastPlan=p;
+  $("bagsLabel").textContent="How many "+S.size+"-card bags?";
+  var label=st.pay==="cash"?"cash":"credit";
+  var html="", sumVal=0, fees=0;
+  p.bags.forEach(function(b,i){
+    var v=b.reduce(function(a,x){return a+val(x);},0);
+    sumVal+=v; fees+=S.fee;
+    var net=v-S.fee, partial=b.length<S.size;
+    html+='<details class="bag"'+(i===0?' open':'')+'><summary><span>Bag '+(i+1)+': '+b.length+' card'+(b.length===1?'':'s')+', '+money(v)+' '+label+', bag fee '+money(S.fee)+', you get '+money(Math.max(0,net))+
+      (partial?' <span class="fill">&middot; '+(S.size-b.length)+' more card'+((S.size-b.length)===1?'':'s')+' would fill it</span>':'')+'</span></summary>'+
+      '<div class="detail"><table><thead><tr><th class="num">Qty</th><th>Card</th><th>Cond.</th><th class="num">CK pays each</th><th class="num">CK % of market</th></tr></thead><tbody>'+
+      group(b).map(function(g){
+        var r=g.x.r;
+        return '<tr><td class="num">'+g.n+'</td><td>'+esc(r.n)+(r.f?'<span class="tag">Foil</span>':'')+' <span class="cmeta">'+esc(r.s)+'</span></td><td>'+r.c+'</td><td class="num">'+money(val(g.x))+'</td><td class="num '+band(g.x.pct)+'"><b>'+Math.round(g.x.pct)+'%</b></td></tr>';
+      }).join('')+'</tbody></table></div></details>';
+  });
+  if(!p.bags.length) html='<div class="empty">CK is not buying any of your cards right now.</div>';
+  else{
+    var short=p.taken<p.cap;
+    html+='<div class="total">Total: <b>'+p.taken+' cards</b>, '+money(sumVal)+' '+label+', bag fees '+money(fees)+', you get <b>'+money(Math.max(0,sumVal-fees))+'</b>.</div>';
+    if(short) html+='<div class="cmeta">CK is buying only '+p.avail+' copies of your cards, so '+(p.n)+' bags is more than you can fill. Only the bags you need are shown.</div>';
+    else if(p.left>0) html+='<div class="cmeta">'+p.left+' more cards CK is buying stay with you this time (they ranked lower).</div>';
+  }
+  $("plan").innerHTML=html;
+}
+
+// ---- copy and csv
+function planGroups(){
+  var out=[]; if(!lastPlan) return out;
+  lastPlan.bags.forEach(function(b,i){group(b).forEach(function(g){out.push({bag:i+1,g:g});});});
+  return out;
+}
+function copyText(){
+  var m={}, order=[];
+  planGroups().forEach(function(e){
+    var r=e.g.x.r, key=e.g.x.i;
+    if(!m[key]){m[key]={r:r,n:0};order.push(key);}
+    m[key].n+=e.g.n;
+  });
+  return order.map(function(k){var o=m[k],r=o.r;return o.n+" "+r.n+" ("+r.s+") #"+r.no+" "+r.c+(r.f?" Foil":"");}).join("\n");
+}
+function csvText(){
+  var h=["Bag","Qty","Card","Set","Number","Foil","Condition","CK pays cash each","CK pays credit each","Market price","CK % of market"];
+  var lines=[h.join(",")];
+  function q(s){return '"'+String(s).replace(/"/g,'""')+'"';}
+  planGroups().forEach(function(e){
+    var r=e.g.x.r, x=e.g.x;
+    lines.push([e.bag,e.g.n,q(r.n),q(r.s),q(r.no),r.f?"Yes":"No",r.c,(x.cash/100).toFixed(2),(x.credit/100).toFixed(2),(r.mk/100).toFixed(2),Math.round(x.pct)+"%"].join(","));
+  });
+  return lines.join("\r\n");
+}
+var tt;
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){e.classList.remove("show");},2200);}
+$("copy").addEventListener("click",function(){
+  var t=copyText();
+  function fallback(){
+    var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();
+    try{document.execCommand("copy");toast("List copied. Paste it where CK asks for your cards.");}catch(e){toast("Could not copy. Try again.");}
+    document.body.removeChild(a);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("List copied. Paste it where CK asks for your cards.");},fallback);}
+  else fallback();
+});
+$("csv").addEventListener("click",function(){
+  var blob=new Blob([csvText()],{type:"text/csv"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ck-shipment-plan.csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);},500);
+  toast("CSV saved.");
+});
+
+// ---- wiring
+function all(){renderStatus();renderCards();renderPlan();}
+$("tbody").addEventListener("change",function(e){
+  if(e.target.classList.contains("cond")){CARDS[+e.target.getAttribute("data-i")].c=e.target.value;all();}
+});
+$("onlyBuying").addEventListener("change",function(e){st.only=e.target.checked;renderCards();});
+$("search").addEventListener("input",function(e){st.q=e.target.value;renderCards();});
+$("bags").addEventListener("input",function(e){
+  var v=parseInt(e.target.value,10);
+  if(v>=1){st.bags=Math.min(20,v);renderPlan();}
+});
+$("bags").addEventListener("blur",function(e){e.target.value=Math.max(1,Math.min(20,parseInt(e.target.value,10)||1));st.bags=+e.target.value;renderPlan();});
+document.querySelectorAll("#pay button").forEach(function(b){b.addEventListener("click",function(){
+  st.pay=b.getAttribute("data-p");
+  document.querySelectorAll("#pay button").forEach(function(o){o.setAttribute("aria-pressed",o===b?"true":"false");});
+  renderPlan();
+});});
+document.querySelectorAll("#mode button").forEach(function(b){b.addEventListener("click",function(){
+  document.querySelectorAll("#mode button").forEach(function(o){o.setAttribute("aria-pressed",o===b?"true":"false");});
+});});
+$("showUnrec").addEventListener("click",function(){
+  var u=$("unrec"), on=u.classList.toggle("show");
+  this.textContent=on?"(hide)":"(show)";
+});
+function drop(){toast("Mockup: this is where you would pick your export file.");}
+$("drop").addEventListener("click",drop);
+$("drop").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();drop();}});
+["dragenter","dragover"].forEach(function(ev){$("drop").addEventListener(ev,function(e){e.preventDefault();$("drop").classList.add("over");});});
+["dragleave","drop"].forEach(function(ev){$("drop").addEventListener(ev,function(e){e.preventDefault();$("drop").classList.remove("over");if(ev==="drop")drop();});});
+$("update").addEventListener("click",function(){
+  var b=this; b.disabled=true; b.textContent="Updating...";
+  setTimeout(function(){
+    b.disabled=false;b.textContent="Update prices";
+    var d=new Date(), h=d.getHours(), m=("0"+d.getMinutes()).slice(-2);
+    st.updated="today, "+((h%12)||12)+":"+m+" "+(h>=12?"pm":"am");
+    if(st.first){setFirst(false);}
+    all();toast("Prices updated.");
+  },900);
+});
+function setFirst(on){
+  st.first=on;document.body.classList.toggle("first",on);
+  $("firstToggle").textContent=on?"show full view":"show first-visit view";
+  renderStatus();
+}
+$("firstToggle").addEventListener("click",function(){setFirst(!st.first);});
+[["setSize","size",1],["setFee","fee",100],["setEX","ex",1],["setVG","vg",1],["setCredit","credit",1]].forEach(function(a){
+  $(a[0]).addEventListener("input",function(e){
+    var v=parseFloat(e.target.value); if(isNaN(v)||v<0) return;
+    S[a[1]]=a[1]==="size"?Math.max(1,Math.round(v)):a[1]==="fee"?Math.round(v*100):v;
+    all();
+  });
+});
+// theme
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);try{localStorage.setItem("sk-theme",t);}catch(e){}}
+try{var saved=localStorage.getItem("sk-theme");if(saved==="light"||saved==="dark")document.documentElement.setAttribute("data-theme",saved);}catch(e){}
+$("theme").addEventListener("click",function(){setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");});
+
+all();
+})();
+</script>
+</body>
+</html>
