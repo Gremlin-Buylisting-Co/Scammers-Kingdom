@@ -1,6 +1,6 @@
 # Scammer's Kingdom
 
-To assist with Card Kingdom (CK) buylist orders. Import your collection from shoptcg.online and the tool works out which of your cards are worth selling to CK, and tells you when CK puts cards back on its buylist. It saves you the slow job of looking up each card one at a time when you are buylisting.
+To assist with Card Kingdom (CK) buylist orders. Import your collection from shoptcg.online and the tool works out which of your cards are worth selling to CK, and tells you when CK puts cards back on its buylist. It saves you the slow job of looking up each card one at a time when you are buylisting. It also writes a CSV that Card Kingdom accepts as an upload to the Sell cart.
 
 It is made for a group of friends who sell Magic cards to CK together. Each person runs it on their own PC. It answers one question: which of my cards should I send to CK, and which should I keep?
 
